@@ -8,6 +8,14 @@ import { Image, StyleSheet, Button, View, Text, TouchableOpacity } from 'react-n
 
 export default function App() {
 
+  return (
+    <View style={styles.container}>
+
+    </View>
+
+
+  );
+
 }
 
 
