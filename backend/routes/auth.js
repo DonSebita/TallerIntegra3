@@ -1,6 +1,9 @@
+require('dotenv').config(); // Cargar variables de entorno desde el archivo .env
+
 const fs = require('fs');
 const { google } = require('googleapis');
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
@@ -12,7 +15,7 @@ try {
   credentials = JSON.parse(fs.readFileSync('credentials.json'));
 } catch (error) {
   console.error('Error al leer el archivo credentials.json:', error);
-  process.exit(1); // Detiene el servidor si no se puede cargar el archivo
+  process.exit(1);
 }
 
 const { client_secret, client_id, redirect_uris } = credentials.installed || credentials.web;
@@ -21,7 +24,7 @@ const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_u
 // Ruta para redirigir al usuario a la página de autenticación de Google
 router.get('/google', (req, res) => {
   const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline', // Permite usar tokens de actualización
+    access_type: 'offline',
     scope: SCOPES,
   });
   console.log('Redirigiendo a URL de autenticación:', authUrl);
@@ -31,27 +34,38 @@ router.get('/google', (req, res) => {
 // Ruta para manejar el callback de Google OAuth y obtener el token de acceso
 router.get('/google/callback', (req, res) => {
   const code = req.query.code;
-  
+
   oAuth2Client.getToken(code, (err, token) => {
     if (err) return res.status(400).send('Error al obtener el token de acceso: ' + err);
-    
-    // Guardar el token en token.json
+
     fs.writeFileSync(TOKEN_PATH, JSON.stringify(token));
     oAuth2Client.setCredentials(token);
-    
+
     res.send('Autenticación completada. Token guardado.');
   });
 });
 
-// Middleware para asegurarse de que el usuario esté autenticado
-function ensureAuthenticated(req, res, next) {
-  if (!fs.existsSync(TOKEN_PATH)) {
-    return res.status(403).send('Usuario no autenticado.');
-  }
-  
-  const token = JSON.parse(fs.readFileSync(TOKEN_PATH));
-  oAuth2Client.setCredentials(token);
-  next(); // Continuar con la siguiente acción
-}
+// Ruta para iniciar sesión y obtener un token JWT
+router.post('/login', async (req, res) => {
+  const { rut, contraseña } = req.body;
 
-module.exports = { router, oAuth2Client, ensureAuthenticated };
+  try {
+    const [user] = await db.query('SELECT * FROM Usuarios WHERE rut = ?', [rut]);
+    
+    if (!user) return res.status(401).send('Usuario no encontrado');
+
+    const match = await bcrypt.compare(contraseña, user.contraseña);
+    if (!match) return res.status(401).send('Contraseña incorrecta');
+
+    // Generar un token JWT
+    const token = jwt.sign({ id: user.usuario_id, rut: user.rut }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({ token });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
+module.exports = { router, oAuth2Client };
