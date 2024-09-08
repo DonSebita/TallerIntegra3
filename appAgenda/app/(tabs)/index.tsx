@@ -2,7 +2,7 @@ import * as React from 'react';
 import { StyleSheet, Button, View, Text, TextInput, } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { G, Path, Defs, Pattern, Use, Image } from "react-native-svg"
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function App() {
 
