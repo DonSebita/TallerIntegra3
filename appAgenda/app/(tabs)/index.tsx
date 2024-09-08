@@ -1,6 +1,4 @@
 import * as React from 'react';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
 import { StyleSheet, Button, View, Text, TextInput, } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { G, Path, Defs, Pattern, Use, Image } from "react-native-svg"
