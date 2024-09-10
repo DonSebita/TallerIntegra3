@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { check, validationResult } = require('express-validator');
-const db = require('../../db'); // Conexión a la base de datos
+const db = require('../../config/db.js'); // Conexión a la base de datos
 
 const router = express.Router();
 
