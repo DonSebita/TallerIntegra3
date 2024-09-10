@@ -3,6 +3,7 @@ import { StyleSheet, Button, View, Text, TextInput, } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { G, Path, Defs, Pattern, Use, Image } from "react-native-svg"
 import { LinearGradient } from 'expo-linear-gradient';
+import ButtonGradient from './ButtonGradient';
 
 export default function App() {
 
@@ -71,6 +72,7 @@ export default function App() {
          placeholder="Contraseña"
          style={styles.textInput}
        />
+       <ButtonGradient/>
        <StatusBar style="auto"/>
     </View>
 
@@ -110,12 +112,22 @@ const styles = StyleSheet.create({
      marginTop: 20,
      borderRadius: 30,
      backgroundColor: '#fff',
+   },
+
+   forgotPassword: {
+     fontSize: 14,
+     color: 'gray',
+     marginTop: 20,
+
+
+   },
+
+   button: {
 
 
 
+   },
 
-
-   }
 
 
 
