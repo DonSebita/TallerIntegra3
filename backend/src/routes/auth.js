@@ -45,27 +45,4 @@ router.get('/google/callback', (req, res) => {
   });
 });
 
-// Ruta para iniciar sesión y obtener un token JWT
-router.post('/login', async (req, res) => {
-  const { rut, contraseña } = req.body;
-
-  try {
-    const [user] = await db.query('SELECT * FROM Usuarios WHERE rut = ?', [rut]);
-    
-    if (!user) return res.status(401).send('Usuario no encontrado');
-
-    const match = await bcrypt.compare(contraseña, user.contraseña);
-    if (!match) return res.status(401).send('Contraseña incorrecta');
-
-    // Generar un token JWT
-    const token = jwt.sign({ id: user.usuario_id, rut: user.rut }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ token });
-
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Error en el servidor');
-  }
-});
-
 module.exports = { router, oAuth2Client };

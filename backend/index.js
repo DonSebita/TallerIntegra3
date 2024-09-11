@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const { authenticateToken } = require('./src/middleware/authMiddleware.js'); // Importar el middleware de autenticación
 const authRoutes = require('./src/routes/auth.js');
 const calendarRoutes = require('./src/routes/calendar.js');
-const userRoutes = require('./src/routes/users/user.js');
+const userRoutes = require('./src/routes/authUsers.js');
 const db = require('./src/config/db.js');
 
 const app = express();
