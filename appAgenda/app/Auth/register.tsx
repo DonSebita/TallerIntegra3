@@ -1,8 +1,26 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, ScrollView } from 'react-native';
 
-const RegistroForm = () => {
-  const [formData, setFormData] = useState({
+// Define el tipo de datos que manejará el formulario
+interface FormData {
+  nombres: string;
+  apellidos: string;
+  fechaNacimiento: string;
+  comuna: string;
+  ciudad: string;
+  direccion: string;
+  telefono: string;
+  correo: string;
+  contraseña: string;
+}
+
+// Define las props que recibirá el componente
+interface RegisterProps {
+  onRegister: (formData: FormData) => void;
+}
+
+const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
+  const [formData, setFormData] = useState<FormData>({
     nombres: '',
     apellidos: '',
     fechaNacimiento: '',
@@ -14,7 +32,7 @@ const RegistroForm = () => {
     contraseña: '',
   });
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (name: keyof FormData, value: string) => {
     setFormData({
       ...formData,
       [name]: value,
@@ -22,7 +40,7 @@ const RegistroForm = () => {
   };
 
   const handleSubmit = () => {
-    console.log(formData); // Aquí puedes procesar el envío del formulario
+    onRegister(formData); // Llama a la función onRegister con los datos del formulario
   };
 
   return (

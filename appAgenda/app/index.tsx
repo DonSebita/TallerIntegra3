@@ -1,5 +1,6 @@
-import * as React from 'react';
-import { StyleSheet, Button, View, Text, TextInput, } from 'react-native';
+import * as React from 'react'; 
+import { useState } from 'react';
+import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { G, Path, Defs, Pattern, Use, Image } from "react-native-svg"
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,7 +8,11 @@ import ButtonGradient from '@/scripts/ButtonGradient';
 import Footer from '@/scripts/Footer';
 
 export default function App() {
+  const [isRegistering, setIsRegistering] = useState(false);
 
+  const handleRegister = (formData: FormData) => {
+    console.log('Registrando:', formData);
+  };
 
     function SvgTop() {
 
@@ -22,12 +27,7 @@ export default function App() {
           <Path stroke="#000" d="M4.5.5h834v410H4.5z" />
         </G>
         <Defs>
-          <Pattern
-            id="b"
-            width={1}
-            height={1}
-            patternContentUnits="objectBoundingBox"
-          >
+          <Pattern id="b" width={1} height={1} patternContentUnits="objectBoundingBox">
             <Use href="#c" transform="matrix(.00098 0 0 .00198 0 -.285)" />
       </Pattern>
       <Image
@@ -38,23 +38,8 @@ export default function App() {
       />
     </Defs>
       </Svg>
-
-
-
-
-
-       )
-
-
-
-
-
-    }
-
-
-
-
-
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -83,9 +68,7 @@ export default function App() {
     
 
   );
-
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -93,7 +76,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#99FF99',
     alignItems: 'center',
     justifyContent: 'center',
-    
   },
    titulo:{
       fontSize: 50,
