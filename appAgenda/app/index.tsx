@@ -44,8 +44,7 @@ export default function App() {
   return (
     <View style={styles.container}>
        <SvgTop/>
-       <br />
-       <br />
+
        <Text style={styles.titulo}>Inicio de Sesion</Text>
        <Text style={styles.subTitle}>Accede a tu cuenta</Text>
        <TextInput
@@ -56,11 +55,6 @@ export default function App() {
          placeholder="Contraseña"
          style={styles.textInput}
        />
-       <br />
-       <br />
-       <br />
-       <br />
-       <br />
        
        <StatusBar style="auto"/>
        <Footer/>
