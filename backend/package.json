@@ -4,8 +4,8 @@
   "description": "backend de proyecto taller de integracion 3",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "dev": "nodemon src/",
+    "start": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -19,5 +19,8 @@
     "googleapis": "^144.0.0",
     "jsonwebtoken": "^9.0.2",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

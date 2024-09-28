@@ -3,6 +3,11 @@ const jwt = require('jsonwebtoken'); // Asegúrate de importar jwt
 const db = require('../config/db'); // Asegúrate de importar tu conexión a la base de datos
 
 async function registerController(req, res) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const {
     rut,
     primer_nombre,
@@ -22,11 +27,19 @@ async function registerController(req, res) {
   } = req.body; // Extraer valores del cuerpo de la solicitud
 
   try {
+    const [existingUser] = await db.query('SELECT * FROM usuarios WHERE rut = ?', [rut]);
+    
+    if (existingUser) {
+      return res.status(400).json({ msg: 'El RUT ya está registrado' });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(contraseña, salt);
     
     // Insertar el nuevo usuario en la base de datos
-    await db.query('INSERT INTO usuarios (rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, sector_id, telefono, celular, correo, contraseña, validado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+    await db.query(
+      `INSERT INTO usuarios (rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, sector_id, telefono, celular, correo, contraseña, validado)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
       [rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, sector_id, telefono, celular, correo, hashedPassword, false]);
     
     res.status(201).json({ msg: 'Usuario registrado correctamente' });
@@ -79,8 +92,6 @@ async function adminLoginController(req, res) {
     res.status(500).send('Error en el servidor');
   }
 }
-
-// Función profesionalLoginController sigue el mismo patrón
 
 module.exports = {
   registerController,
