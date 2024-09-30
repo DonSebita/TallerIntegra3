@@ -1,33 +1,40 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, ScrollView, ImageBackground, Alert } from 'react-native';
 
 // Define el tipo de datos que manejará el formulario
 interface FormData {
-  nombres: string;
-  apellidos: string;
-  fechaNacimiento: string;
-  comuna: string;
+  rut: string;
+  primer_nombre: string;
+  segundo_nombre: string;
+  tercer_nombre: string;
+  apellido_paterno: string;
+  apellido_materno: string;
+  fecha_nacimiento: string;
   ciudad: string;
+  comuna: string;
   direccion: string;
+  sector_id: string;
   telefono: string;
+  celular: string;
   correo: string;
   contraseña: string;
 }
 
-// Define las props que recibirá el componente
-interface RegisterProps {
-  onRegister: (formData: FormData) => void;
-}
-
-const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
+const RegistroForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-    nombres: '',
-    apellidos: '',
-    fechaNacimiento: '',
-    comuna: '',
+    rut: '',
+    primer_nombre: '',
+    segundo_nombre: '',
+    tercer_nombre: '',
+    apellido_paterno: '',
+    apellido_materno: '',
+    fecha_nacimiento: '',
     ciudad: '',
+    comuna: '',
     direccion: '',
+    sector_id: '',
     telefono: '',
+    celular: '',
     correo: '',
     contraseña: '',
   });
@@ -39,13 +46,30 @@ const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
     });
   };
 
-  const handleSubmit = () => {
-    onRegister(formData); // Llama a la función onRegister con los datos del formulario
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        Alert.alert('Registro exitoso', 'El usuario ha sido registrado correctamente');
+      } else {
+        Alert.alert('Error', 'Hubo un problema al registrar el usuario');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema con la solicitud');
+    }
   };
 
   return (
     <ImageBackground
-      source={require('../../assets/images/logo-temuco-1024x791.png')} // Imagen como fondo
+      source={require('../../assets/images/logo-temuco-1024x791.png')}
       style={styles.background}
       resizeMode="cover"
     >
@@ -56,22 +80,58 @@ const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
             <Text style={styles.title}>Municipalidad</Text>
           </View>
           
-          <Text style={styles.label}>Nombres</Text>
+          <Text style={styles.label}>RUT</Text>
           <TextInput
             style={styles.input}
-            placeholder="Nombres"
+            placeholder="RUT"
             placeholderTextColor="#A9A9A9"
-            value={formData.nombres}
-            onChangeText={(value) => handleInputChange('nombres', value)}
+            value={formData.rut}
+            onChangeText={(value) => handleInputChange('rut', value)}
           />
 
-          <Text style={styles.label}>Apellidos</Text>
+          <Text style={styles.label}>Primer Nombre</Text>
           <TextInput
             style={styles.input}
-            placeholder="Apellidos"
+            placeholder="Primer Nombre"
             placeholderTextColor="#A9A9A9"
-            value={formData.apellidos}
-            onChangeText={(value) => handleInputChange('apellidos', value)}
+            value={formData.primer_nombre}
+            onChangeText={(value) => handleInputChange('primer_nombre', value)}
+          />
+
+          <Text style={styles.label}>Segundo Nombre</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Segundo Nombre"
+            placeholderTextColor="#A9A9A9"
+            value={formData.segundo_nombre}
+            onChangeText={(value) => handleInputChange('segundo_nombre', value)}
+          />
+
+          <Text style={styles.label}>Tercer Nombre</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Tercer Nombre"
+            placeholderTextColor="#A9A9A9"
+            value={formData.tercer_nombre}
+            onChangeText={(value) => handleInputChange('tercer_nombre', value)}
+          />
+
+          <Text style={styles.label}>Apellido Paterno</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido Paterno"
+            placeholderTextColor="#A9A9A9"
+            value={formData.apellido_paterno}
+            onChangeText={(value) => handleInputChange('apellido_paterno', value)}
+          />
+
+          <Text style={styles.label}>Apellido Materno</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido Materno"
+            placeholderTextColor="#A9A9A9"
+            value={formData.apellido_materno}
+            onChangeText={(value) => handleInputChange('apellido_materno', value)}
           />
 
           <Text style={styles.label}>Fecha de Nacimiento</Text>
@@ -79,17 +139,8 @@ const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
             style={styles.input}
             placeholder="YYYY-MM-DD"
             placeholderTextColor="#A9A9A9"
-            value={formData.fechaNacimiento}
-            onChangeText={(value) => handleInputChange('fechaNacimiento', value)}
-          />
-
-          <Text style={styles.label}>Comuna</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Comuna"
-            placeholderTextColor="#A9A9A9"
-            value={formData.comuna}
-            onChangeText={(value) => handleInputChange('comuna', value)}
+            value={formData.fecha_nacimiento}
+            onChangeText={(value) => handleInputChange('fecha_nacimiento', value)}
           />
 
           <Text style={styles.label}>Ciudad</Text>
@@ -101,6 +152,15 @@ const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
             onChangeText={(value) => handleInputChange('ciudad', value)}
           />
 
+          <Text style={styles.label}>Comuna</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Comuna"
+            placeholderTextColor="#A9A9A9"
+            value={formData.comuna}
+            onChangeText={(value) => handleInputChange('comuna', value)}
+          />
+
           <Text style={styles.label}>Dirección</Text>
           <TextInput
             style={styles.input}
@@ -108,6 +168,15 @@ const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
             placeholderTextColor="#A9A9A9"
             value={formData.direccion}
             onChangeText={(value) => handleInputChange('direccion', value)}
+          />
+
+          <Text style={styles.label}>Sector ID</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Sector ID"
+            placeholderTextColor="#A9A9A9"
+            value={formData.sector_id}
+            onChangeText={(value) => handleInputChange('sector_id', value)}
           />
 
           <Text style={styles.label}>Teléfono</Text>
@@ -118,6 +187,16 @@ const RegistroForm: React.FC<RegisterProps> = ({ onRegister }) => {
             placeholderTextColor="#A9A9A9"
             value={formData.telefono}
             onChangeText={(value) => handleInputChange('telefono', value)}
+          />
+
+          <Text style={styles.label}>Celular</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Celular"
+            keyboardType="phone-pad"
+            placeholderTextColor="#A9A9A9"
+            value={formData.celular}
+            onChangeText={(value) => handleInputChange('celular', value)}
           />
 
           <Text style={styles.label}>Correo</Text>
@@ -153,11 +232,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     justifyContent: 'center',
-    alignItems: 'center', // Centrar contenido horizontalmente
+    alignItems: 'center',
   },
   container: {
     flexGrow: 1,
-    justifyContent: 'center', // Centrar verticalmente
+    justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
@@ -165,38 +244,38 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 15,
     width: '90%',
-    maxWidth: 400, // Limitar el ancho del formulario para pantallas grandes
+    maxWidth: 400,
   },
   titleContainer: {
-    backgroundColor: 'rgba(34, 139, 34, 0.9)', // Verde fuerte y más opaco
-    paddingVertical: 20, // Aumentar padding vertical
-    paddingHorizontal: 40, // Aumentar padding horizontal para cubrir bien el texto
+    backgroundColor: 'rgba(34, 139, 34, 0.9)',
+    paddingVertical: 20,
+    paddingHorizontal: 40,
     borderRadius: 10,
     marginBottom: 20,
-    alignItems: 'center', // Centrar el texto en el recuadro
+    alignItems: 'center',
   },
   title: {
-    fontSize: 32, // Título más grande
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFF', // Texto blanco para buen contraste
+    color: '#FFF',
     textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#A9A9A9', // Borde gris suave
-    backgroundColor: '#FFF', // Mantiene fondo blanco solo en los campos de texto
+    borderColor: '#A9A9A9',
+    backgroundColor: '#FFF',
     padding: 15,
     marginBottom: 15,
     borderRadius: 10,
-    color: '#333', // Texto en gris oscuro
-    fontSize: 16, // Hacer el texto más grande
+    color: '#333',
+    fontSize: 16,
   },
   label: {
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#228B22', // Verde natural para las etiquetas
-    fontSize: 18, // Etiquetas más grandes
+    color: '#228B22',
+    fontSize: 18,
   },
 });
 
-export default RegistroForm;
+export default RegistroForm
