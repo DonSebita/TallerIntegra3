@@ -3,11 +3,16 @@ import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { G, Path, Defs, Pattern, Use, Image } from "react-native-svg"
-import { LinearGradient } from 'expo-linear-gradient';
-import ButtonGradient from '@/scripts/ButtonGradient';
 import Footer from '@/scripts/Footer';
+import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
+
+
 
 export default function App() {
+
+ 
+
+
   const [isRegistering, setIsRegistering] = useState(false);
 
   const handleRegister = (formData: FormData) => {
@@ -43,6 +48,9 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+       
+       
+
        <SvgTop/>
 
        <Text style={styles.titulo}>Inicio de Sesion</Text>
@@ -56,8 +64,10 @@ export default function App() {
          style={styles.textInput}
        />
        
+       
+       <Footer/> 
        <StatusBar style="auto"/>
-       <Footer/>
+       
     </View>
     
 
