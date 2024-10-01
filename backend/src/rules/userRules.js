@@ -41,3 +41,8 @@ const userRules = [
     .matches(/[a-z]/)
     .withMessage("El campo 'password' debe contener al menos una letra minúscula")
 ]
+
+module.exports = {
+  loginRules,
+  userRules
+};

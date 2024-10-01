@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const { authenticateToken } = require('./src/middleware/authMiddleware.js');
-const authRoutes = require('./src/routes/auth.js');
-const calendarRoutes = require('./src/routes/calendar.js');
-const userRoutes = require('./src/routes/users/user.js');
-const db = require('./src/config/db.js');
+const { authenticateToken } = require('./middleware/authMiddleware.js');
+const authRoutes = require('./routes/authUsers.js');
+const calendarRoutes = require('./routes/calendar.js');
+const userRoutes = require('./routes/users/user.js');
+const db = require('./config/db.js');
 
 const app = express();
 const port = process.env.PORT || 3000;
