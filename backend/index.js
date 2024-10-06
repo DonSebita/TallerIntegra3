@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 app.use('/auth', authRoutes);
 
 // Rutas protegidas para el calendario, que incluyen /create-event
-app.use('/api', ensureAuthenticated, calendarRoutes);
+app.use('/api', calendarRoutes);
 
 // Ruta base para verificar que el servidor está corriendo
 app.get('/', (req, res) => {
@@ -38,3 +38,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
+
