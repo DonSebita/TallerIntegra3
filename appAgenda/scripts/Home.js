@@ -1,11 +1,16 @@
 // components/Home.js
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Card, Title, Paragraph } from 'react-native-paper';
+import Tarjeta from './Tarjeta';
 
 const Home = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>¡Bienvenido a mi aplicación!</Text>
+     
+      <Text style={styles.text}>Noticias</Text>
+      <Tarjeta/>
+      
     </View>
   );
 };
