@@ -10,6 +10,7 @@ const TOKEN_PATH = 'token.json';
 
 // Ruta para registrar un nuevo usuario
 router.post('/register', authController);
+router.post('/login', authController);
 
 // Cargar las credenciales desde el archivo credentials.json
 let credentials;

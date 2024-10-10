@@ -51,4 +51,24 @@ router.post('/register', async (req, res) => {
     });
 });
 
+router.post('/login', async (req, res) => {
+    const { rut, contraseña } = req.body;
+    
+    if (!rut || !contraseña){
+        return res.status(400).send('Faltan los campos requeridos');
+    }
+    
+    const { user } = await db.query('SELECT * FROM usuarios WHERE rut = ?', [rut]);
+    
+    if (!user) return res.status(401).send('Usuario no encontrado');
+
+    const match = await bcrypt.compare(contraseña, user.contraseña);
+    if(!match){
+        return res.status(401).send('Contraseña incorrecta');
+    } else {
+        return res.status(201).send('Sesión iniciada correctamente');
+    }
+
+});
+
 module.exports = router;
