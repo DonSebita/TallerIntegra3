@@ -2,16 +2,19 @@ const fs = require('fs');
 const { google } = require('googleapis');
 const express = require('express');
 const authController = require('./authController');
+const { auth } = require('googleapis/build/src/apis/abusiveexperiencereport');
 const router = express.Router();
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const TOKEN_PATH = 'token.json';
 
 
-// Ruta para registrar un nuevo usuario
-router.post('/register', authController);
-router.post('/login', authController);
 
+// Ruta para registrar un nuevo usuario
+router.post('/register', authController.register); // Pasa la función específica para cada ruta
+
+// Ruta para login
+router.post('/login', authController.login); // Ahora la función login
 // Cargar las credenciales desde el archivo credentials.json
 let credentials;
 try {
@@ -59,5 +62,6 @@ function ensureAuthenticated(req, res, next) {
   oAuth2Client.setCredentials(token);
   next(); // Continuar con la siguiente acción
 }
+
 
 module.exports = { router, oAuth2Client, ensureAuthenticated };

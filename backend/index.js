@@ -3,12 +3,12 @@ const cors = require('cors'); // Importa cors
 const bodyParser = require('body-parser');
 const { router: authRoutes, ensureAuthenticated } = require('./auth'); // Importa las rutas de autenticación
 const calendarRoutes = require('./calendar'); // Importa las rutas de Google Calendar
+const passwordRoutes = require('./routes/passwordRoutes'); // Importa las rutas de restablecimiento de contraseña
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 const db = require('./db.js'); // Importa la conexión a la base de datos
-
 
 // Configura CORS
 const corsOptions = {
@@ -29,6 +29,9 @@ app.use('/auth', authRoutes);
 // Rutas protegidas para el calendario, que incluyen /create-event
 app.use('/api', calendarRoutes);
 
+// Usa las rutas de restablecimiento de contraseña
+app.use('/api/password', passwordRoutes);
+
 // Ruta base para verificar que el servidor está corriendo
 app.get('/', (req, res) => {
   res.send('Servidor funcionando correctamente!');
@@ -38,4 +41,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor escuchando en http://localhost:${port}`);
 });
-
