@@ -42,6 +42,34 @@ exports.register = async (req, res) => {
     }
 };
 
+// Función para manejar el login
+exports.login = async (req, res) => {
+    const { rut, contraseña } = req.body;
+
+    if (!rut || !contraseña) {
+        return res.status(400).send('Faltan los campos requeridos');
+    }
+
+    try {
+        const results = await query('SELECT * FROM usuarios where rut = ?', [rut]);
+        
+        if (results.length === 0) return res.status(401).send('Usuario no encontrado');
+
+        const user = results[0]; // obtener el usuario encontrado
+        
+        const match = await bcrypt.compare(contraseña, user.contraseña);
+        
+        if (!match) {
+            return res.status(401).send('Contraseña incorrecta');
+        } else {
+            return res.status(200).send('Sesión iniciada correctamente');
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send('Error en el servidor');
+    }
+};
+
 // Función para solicitar restablecimiento de contraseña
 exports.forgotPassword = async (req, res) => {
     const { correo } = req.body;
@@ -131,32 +159,5 @@ exports.resetPassword = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Error al restablecer la contraseña.' });
-    }
-};
-
-// Función para manejar el login
-exports.login = async (req, res) => {
-    const { rut, contraseña } = req.body;
-
-    if (!rut || !contraseña) {
-        return res.status(400).send('Faltan los campos requeridos');
-    }
-
-    try {
-        const results = await db.query('SELECT * FROM usuarios WHERE rut = ?', [rut]);
-        
-        if (results.length === 0) return res.status(401).send('Usuario no encontrado');
-
-        const user = results[0]; // obtener el usuario encontrado
-        const match = await bcrypt.compare(contraseña, user.contraseña);
-        
-        if (!match) {
-            return res.status(401).send('Contraseña incorrecta');
-        } else {
-            return res.status(200).send('Sesión iniciada correctamente');
-        }
-    } catch (err) {
-        console.error(err);
-        return res.status(500).send('Error en el servidor');
     }
 };
