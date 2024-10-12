@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -22,18 +23,15 @@ const Footer = () => {
       
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.icon}>
-          <Icon name="facebook" size={20} color="#ffffff" />
+          <Icon name="facebook" size={18} color="#ffffff" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
-          <Icon name="twitter" size={20} color="#ffffff" />
+          <Icon name="twitter" size={18} color="#ffffff" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
-          <Icon name="instagram" size={20} color="#ffffff" />
+          <Icon name="instagram" size={18} color="#ffffff" />
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.contact}>Dirección: Calle Ejemplo 123, Ciudad</Text>
-      <Text style={styles.contact}>Teléfono: (123) 456-7890</Text>
 
       <Text style={styles.copy}>© 2024 Tu Municipalidad</Text>
     </View>
@@ -43,8 +41,8 @@ const Footer = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#202020',
-    paddingVertical: 10,
-    alignItems: 'center',
+    paddingVertical: 5, // Reducido para un footer más pequeño
+    alignItems: 'flex-end',
     justifyContent: 'center',
     position: 'absolute',
     bottom: 0,
@@ -59,26 +57,21 @@ const styles = StyleSheet.create({
   link: {
     color: '#ffffff',
     margin: 0,
-    fontSize: 18,
+    fontSize: 16, // Reducido para un footer más pequeño
   },
   socialContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 10,
+    justifyContent: 'flex-end',
+    marginVertical: 5, // Reducido para un footer más pequeño
+    width: '100%',
   },
   icon: {
-    marginHorizontal: 10,
-  },
-  contact: {
-    color: '#ffffff',
-    marginTop: 5,
-    fontSize: 15,
-    textAlign: 'center',
+    marginHorizontal: 8, // Reducido para un footer más pequeño
   },
   copy: {
     color: '#ffffff',
     marginTop: 0,
-    fontSize: 15,
+    fontSize: 14, // Reducido para un footer más pequeño
   },
 });
 

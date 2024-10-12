@@ -8,7 +8,7 @@ const Tarjeta = () => {
       <Card style={styles.card}>
         <Card.Content>
           <Title style={styles.title}>Noticias Municipales</Title>
-          <Card.Cover source={{ uri: 'https://cdn.www.gob.pe/uploads/document/file/6843516/1010099-adulto-mayor.jpg' }} />
+          <Card.Cover source={{ uri: 'https://images.ligup2.com/eyJidWNrZXQiOiJsaWd1cC12MiIsImtleSI6ImRlcG9ydGVtdW5pY2lwYWwvcGhvdG9zLzQzNDE5X3NlZGVfdmVjaW5hbF92aWxsYV90ZW11Y28ucG5nIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJmaXQiOiJjb3ZlciJ9LCJyb3RhdGUiOm51bGx9fQ==' }} />
           <Card.Actions>
             <Button mode="contained" style={styles.button} labelStyle={styles.buttonLabel}>Información</Button>
             <Button mode="contained" style={styles.button} labelStyle={styles.buttonLabel}>Documentos</Button>
