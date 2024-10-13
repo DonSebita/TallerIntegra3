@@ -1,14 +1,14 @@
 const express = require('express');
 const cors = require('cors'); // Importa cors
 const bodyParser = require('body-parser');
-const { router: authRoutes, ensureAuthenticated } = require('./auth'); // Importa las rutas de autenticación
-const calendarRoutes = require('./calendar'); // Importa las rutas de Google Calendar
-const passwordRoutes = require('./routes/passwordRoutes'); // Importa las rutas de restablecimiento de contraseña
+const { router: authRoutes, ensureAuthenticated } = require('./routes/auth.js'); // Importa las rutas de autenticación
+const calendarRoutes = require('./services/calendar.js'); // Importa las rutas de Google Calendar
+const passwordRoutes = require('./routes/passwordRoutes.js'); // Importa las rutas de restablecimiento de contraseña
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const db = require('./db.js'); // Importa la conexión a la base de datos
+const db = require('./config/db.js'); // Importa la conexión a la base de datos
 
 // Configura CORS
 const corsOptions = {

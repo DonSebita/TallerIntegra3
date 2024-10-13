@@ -1,5 +1,5 @@
 const express = require('express');
-const { forgotPassword, resetPassword } = require('../authController'); // Asegúrate de que las funciones existen en authController
+const { forgotPassword, resetPassword } = require('../controllers/authController.js'); // Asegúrate de que las funciones existen en authController
 const router = express.Router();
 
 // Ruta para solicitar el restablecimiento de contraseña

@@ -1,12 +1,13 @@
 const fs = require('fs');
+const path = require('path');
 const { google } = require('googleapis');
 const express = require('express');
-const authController = require('./authController');
+const authController = require('../controllers/authController.js');
 const { auth } = require('googleapis/build/src/apis/abusiveexperiencereport');
 const router = express.Router();
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const TOKEN_PATH = 'token.json';
+const TOKEN_PATH = path.resolve(__dirname, '../config/token.json');
 
 
 
@@ -15,10 +16,14 @@ router.post('/register', authController.register); // Pasa la función específi
 
 // Ruta para login
 router.post('/login', authController.login); // Ahora la función login
+
+// Define la ruta absoluta al archivo credentials.json
+const credentialsPath = path.resolve(__dirname, '../config/credentials.json');
+
 // Cargar las credenciales desde el archivo credentials.json
 let credentials;
 try {
-  credentials = JSON.parse(fs.readFileSync('credentials.json'));
+  credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8'));
 } catch (error) {
   console.error('Error al leer el archivo credentials.json:', error);
   process.exit(1); // Detiene el servidor si no se puede cargar el archivo

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const db = require('./db');
+const db = require('../config/db.js');
 const { promisify } = require('util');
 
 // Convertir `db.query` a una promesa
@@ -36,6 +36,8 @@ exports.register = async (req, res) => {
     try {
         await query(insertUserQuery, values);
         res.status(201).send('Usuario registrado exitosamente.');
+
+        console.log('POST - register: Se ingreso el usuario a la base de datos')
     } catch (err) {
         console.error('Error al insertar el usuario en la base de datos:', err);
         res.status(500).send('Error al registrar el usuario.');
@@ -62,6 +64,7 @@ exports.login = async (req, res) => {
         if (!match) {
             return res.status(401).send('Contraseña incorrecta');
         } else {
+            console.log('POST - login: El usuario inicio sesión correctamente')
             return res.status(200).send('Sesión iniciada correctamente');
         }
     } catch (err) {
