@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Redirect } from 'expo-router';
+import { router } from 'expo-router';
 import Footer from '@/scripts/Footer';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
 
@@ -36,7 +36,7 @@ const LoginForm: React.FC = () => {
       });
 
       if (response.ok) {
-        return <Redirect href="/Home/inicio" />;
+        router.navigate('/Home/inicio');
       } else {
         Alert.alert('Error', 'Hubo un problema al iniciar sesión');
       }
@@ -118,6 +118,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
     marginTop: 20,
+  },
+
+  button: {
+
   },
   
   footer: {
