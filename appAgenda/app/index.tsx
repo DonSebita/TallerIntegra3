@@ -1,44 +1,50 @@
 import * as React from 'react'; 
 import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, Image, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Svg, { G, Path, Defs, Pattern, Use } from "react-native-svg"
+import { Redirect } from 'expo-router';
 import Footer from '@/scripts/Footer';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
 
-export default function App() {
-  const [isRegistering, setIsRegistering] = useState(false);
+// Define el tipo de datos que manejará el formulario
+interface FormData {
+  rut: string;
+  contraseña: string;
+}
 
-  const handleRegister = (formData: FormData) => {
-    console.log('Registrando:', formData);
+const LoginForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    rut: '',
+    contraseña: '',
+  });
+
+  const handleInputChange = (name: keyof FormData, value: string) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
-  
-  function SvgTop() {
-    return (
-      <Svg
-        width={500}
-        height={250}
-        fill="none"
-      >
-        <G filter="url(#a)" shapeRendering="crispEdges">
-          <Path fill="url(#b)" d="M4 0h835v411H4z" />
-          <Path stroke="#000" d="M4.5.5h834v410H4.5z" />
-        </G>
-      
-        <Defs>
-          <Pattern id="b" width={1} height={1} patternContentUnits="objectBoundingBox">
-            <Use href="#c" transform="matrix(.00098 0 0 .00198 0 -.285)" />
-          </Pattern>
-          <Image
-            id="c"
-            source={require('@/assets/images/logo-muni.png')}
-            width={650}
-            height={590}
-          />
-        </Defs>
-      </Svg>
-    );
-  }
+
+  const handleSubmit = async () => {
+    try{
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        return <Redirect href="/Home/inicio" />;
+      } else {
+        Alert.alert('Error', 'Hubo un problema al iniciar sesión');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema con la solicitud');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -51,21 +57,30 @@ export default function App() {
 
       <Text style={styles.titulo}>Inicio de Sesion</Text>
       <Text style={styles.subTitle}>Accede a tu cuenta</Text>
+
       <TextInput
-        placeholder="Rut"
+        placeholder="RUT"
         style={styles.textInput}
+        value={formData.rut}
+        onChangeText={(value) => handleInputChange('rut', value)}
       />
       <TextInput
         placeholder="Contraseña"
         secureTextEntry={true}
         style={styles.textInput}
-      /> 
+        value={formData.contraseña}
+        onChangeText={(value) => handleInputChange('contraseña', value)}
+      />
+
+      <Button title='Iniciar Sesión' color="#228B22" onPress={handleSubmit} />
       <Footer/> 
       <StatusBar style="auto"/>
     </View>
 
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -93,9 +108,10 @@ const styles = StyleSheet.create({
     paddingStart: 30,
     width: 300,
     height: 50,
-    marginTop: 20,
+    marginTop: 10,
     borderColor: 'black',
-    borderWidth: 1
+    borderWidth: 1,
+    marginBottom: 10,
   },
 
   forgotPassword: {
@@ -104,12 +120,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   
-  button: {
-
-  },
-  
   footer: {
     marginTop: 20,
   },
 
 });
+
+export default LoginForm
