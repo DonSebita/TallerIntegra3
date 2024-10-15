@@ -1,6 +1,6 @@
 import * as React from 'react'; 
 import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import Footer from '@/scripts/Footer';
@@ -46,33 +46,37 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  const windowWidth = Dimensions.get('window').width;
+  const isMobile = windowWidth < 768;
+
   return (
-    <View style={styles.container}>
+    <View style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
       <Image
-        id="c"
         source={require('@/assets/images/logo-muni.png')}
-        width={650}
-        height={590}
+        style={isMobile ? styles.mobileLogo : styles.desktopLogo}
       />
 
-      <Text style={styles.titulo}>Inicio de Sesion</Text>
-      <Text style={styles.subTitle}>Accede a tu cuenta</Text>
+      <View style={isMobile ? styles.mobileForm : styles.formContainer}>
+        <Text style={styles.titulo}>Inicio de Sesion</Text>
+        <Text style={styles.subTitle}>Accede a tu cuenta</Text>
 
-      <TextInput
-        placeholder="RUT"
-        style={styles.textInput}
-        value={formData.rut}
-        onChangeText={(value) => handleInputChange('rut', value)}
-      />
-      <TextInput
-        placeholder="Contraseña"
-        secureTextEntry={true}
-        style={styles.textInput}
-        value={formData.contraseña}
-        onChangeText={(value) => handleInputChange('contraseña', value)}
-      />
+        <TextInput
+          placeholder="RUT"
+          style={styles.textInput}
+          value={formData.rut}
+          onChangeText={(value) => handleInputChange('rut', value)}
+        />
+        <TextInput
+          placeholder="Contraseña"
+          secureTextEntry={true}
+          style={styles.textInput}
+          value={formData.contraseña}
+          onChangeText={(value) => handleInputChange('contraseña', value)}
+        />
 
-      <Button title='Iniciar Sesión' color="#228B22" onPress={handleSubmit} />
+        <Button title='Iniciar Sesión' color="#00ae41" onPress={handleSubmit} />
+      </View>
+      
       <Footer/> 
       <StatusBar style="auto"/>
     </View>
@@ -83,12 +87,39 @@ const LoginForm: React.FC = () => {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  desktopContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: '10%',
+    paddingBottom: '17.3%',
     backgroundColor: '#FFFFFF',
+  },
+
+
+  mobileContainer: {
+    padding: 20,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: '5%'
+    paddingBottom: '10%'
+  },
+
+  desktopLogo: {
+    width: '50%',
+    height: 'auto',
+    resizeMode: 'contain',
+  },
+
+  mobileLogo: {
+    height: '20%',
+    resizeMode: 'contain'
+  },
+
+  formContainer: {
+    width: '45%',
+  },
+
+  mobileForm: {
+    width: '100%',
   },
 
   titulo:{
@@ -101,17 +132,19 @@ const styles = StyleSheet.create({
   subTitle: {
     fontSize: 30,
     color: 'gray',
+    marginBottom: '2%',
   },
   
   textInput: {
     padding: 10,
     paddingStart: 30,
-    width: 300,
+    width: '100%',
     height: 50,
     marginTop: 10,
     borderColor: 'black',
     borderWidth: 1,
-    marginBottom: 10,
+    marginBottom: '5%',
+    fontSize: 20,
   },
 
   forgotPassword: {
@@ -122,10 +155,6 @@ const styles = StyleSheet.create({
 
   button: {
 
-  },
-  
-  footer: {
-    marginTop: 20,
   },
 
 });
