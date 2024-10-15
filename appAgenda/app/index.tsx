@@ -1,115 +1,75 @@
-import * as React from 'react'; 
-import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import Svg, { G, Path, Defs, Pattern, Use } from "react-native-svg"
+import React from 'react';
+import { SafeAreaView, StyleSheet, Button, View } from 'react-native';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import Header from '@/scripts/Header';
+import Home from '@/scripts/Home';
 import Footer from '@/scripts/Footer';
-import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
+import RegisterScreen from './Auth/register';  // Asegúrate de la ruta correcta
+import LoginScreen from './Auth/Login';        // Asegúrate de la ruta correcta
 
-export default function App() {
-  const [isRegistering, setIsRegistering] = useState(false);
+type RootStackParamList = {
+  Home: undefined;
+  Register: undefined;
+  Login: undefined;
+};
 
-  const handleRegister = (formData: FormData) => {
-    console.log('Registrando:', formData);
-  };
-  
-  function SvgTop() {
-    return (
-      <Svg
-        width={500}
-        height={250}
-        fill="none"
-      >
-        <G filter="url(#a)" shapeRendering="crispEdges">
-          <Path fill="url(#b)" d="M4 0h835v411H4z" />
-          <Path stroke="#000" d="M4.5.5h834v410H4.5z" />
-        </G>
-      
-        <Defs>
-          <Pattern id="b" width={1} height={1} patternContentUnits="objectBoundingBox">
-            <Use href="#c" transform="matrix(.00098 0 0 .00198 0 -.285)" />
-          </Pattern>
-          <Image
-            id="c"
-            source={require('@/assets/images/logo-muni.png')}
-            width={650}
-            height={590}
-          />
-        </Defs>
-      </Svg>
-    );
-  }
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
+type HomeScreenProps = {
+  navigation: HomeScreenNavigationProp;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Image
-        id="c"
-        source={require('@/assets/images/logo-muni.png')}
-        width={650}
-        height={590}
-      />
-
-      <Text style={styles.titulo}>Inicio de Sesion</Text>
-      <Text style={styles.subTitle}>Accede a tu cuenta</Text>
-      <TextInput
-        placeholder="Rut"
-        style={styles.textInput}
-      />
-      <TextInput
-        placeholder="Contraseña"
-        secureTextEntry={true}
-        style={styles.textInput}
-      /> 
-      <Footer/> 
-      <StatusBar style="auto"/>
-    </View>
-
+    <SafeAreaView style={styles.container}>
+      <Header />
+      <Home />
+      <View style={styles.buttonsContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Registro"
+            onPress={() => navigation.navigate('Register')}
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Login"
+            onPress={() => navigation.navigate('Login')}
+          />
+        </View>
+      </View>
+      <Footer />
+    </SafeAreaView>
   );
-}
+};
+
+const AppStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registro' }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Iniciar Sesión' }} />
+    </Stack.Navigator>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: '5%'
+    backgroundColor: '#4CAF50',
   },
-
-  titulo:{
-    marginTop: 20,
-    fontSize: 50,
-    color: '#34434D',
-    fontWeight: 'bold',
+  buttonsContainer: {
+    position: 'absolute',
+    top: 10,   // Ubica los botones en la parte superior
+    right: 10, // Ubica los botones a la derecha
+    flexDirection: 'row',
   },
-  
-  subTitle: {
-    fontSize: 30,
-    color: 'gray',
+  buttonWrapper: {
+    marginLeft: 10,  // Espacio entre los botones
+    width: 80,       // Ancho de cada botón
   },
-  
-  textInput: {
-    padding: 10,
-    paddingStart: 30,
-    width: 300,
-    height: 50,
-    marginTop: 20,
-    borderColor: 'black',
-    borderWidth: 1
-  },
-
-  forgotPassword: {
-    fontSize: 14,
-    color: 'gray',
-    marginTop: 20,
-  },
-  
-  button: {
-
-  },
-  
-  footer: {
-    marginTop: 20,
-  },
-
 });
+
+export default AppStack;
