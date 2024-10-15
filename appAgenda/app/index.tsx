@@ -2,21 +2,48 @@ import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Svg, { G, Path, Defs, Pattern, Use, Image } from "react-native-svg"
+import { router } from 'expo-router';
 import Footer from '@/scripts/Footer';
 import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
 
+// Define el tipo de datos que manejará el formulario
+interface FormData {
+  rut: string;
+  contraseña: string;
+}
 
+const LoginForm: React.FC = () => {
+  const [formData, setFormData] = useState<FormData>({
+    rut: '',
+    contraseña: '',
+  });
 
-export default function App() {
+  const handleInputChange = (name: keyof FormData, value: string) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
- 
+  const handleSubmit = async () => {
+    try{
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-
-  const [isRegistering, setIsRegistering] = useState(false);
-
-  const handleRegister = (formData: FormData) => {
-    console.log('Registrando:', formData);
+      if (response.ok) {
+        router.navigate('/Home/inicio');
+      } else {
+        Alert.alert('Error', 'Hubo un problema al iniciar sesión');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema con la solicitud');
+    }
   };
 
   const windowWidth = Dimensions.get('window').width;
@@ -28,10 +55,6 @@ export default function App() {
         source={require('@/assets/images/logo-muni.png')}
         style={isMobile ? styles.mobileLogo : styles.desktopLogo}
       />
-    </Defs>
-      </Svg>
-    );
-  }
 
       <View style={isMobile ? styles.mobileForm : styles.formContainer}>
         <Text style={styles.titulo}>Inicio de Sesion</Text>
@@ -57,10 +80,11 @@ export default function App() {
       <Footer/> 
       <StatusBar style="auto"/>
     </View>
-    
 
   );
 }
+
+
 
 const styles = StyleSheet.create({
   desktopContainer: {
@@ -78,10 +102,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingBottom: '10%'
   },
-   titulo:{
-      fontSize: 50,
-      color: '#34434D',
-      fontWeight: 'bold',
 
   desktopLogo: {
     width: '50%',
@@ -127,46 +147,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-   },
-   
-   subTitle: {
-     fontSize: 30,
-     color: 'gray',
-   },
+  forgotPassword: {
+    fontSize: 14,
+    color: 'gray',
+    marginTop: 20,
+  },
 
-   textInput: {
-     
-     padding: 10,
-     paddingStart: 30,
-     width: '20%',
-     height: 50,
-     marginTop: 20,
-     borderRadius: 30,
-     backgroundColor: '#fff',
-   },
+  button: {
 
   },
 
-
-   },
-
-   button: {
-
-
-
-   },
-
-   footer: {
-     marginTop: 20,
-
-
-
-   },
-
-
-
-
-
-
-
 });
+
+export default LoginForm
