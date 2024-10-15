@@ -1,162 +1,75 @@
-import * as React from 'react'; 
-import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { router } from 'expo-router';
+import React from 'react';
+import { SafeAreaView, StyleSheet, Button, View } from 'react-native';
+import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import Header from '@/scripts/Header';
+import Home from '@/scripts/Home';
 import Footer from '@/scripts/Footer';
-import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
+import RegisterScreen from './Auth/register';  // Asegúrate de la ruta correcta
+import LoginScreen from './Auth/Login';        // Asegúrate de la ruta correcta
 
-// Define el tipo de datos que manejará el formulario
-interface FormData {
-  rut: string;
-  contraseña: string;
-}
+type RootStackParamList = {
+  Home: undefined;
+  Register: undefined;
+  Login: undefined;
+};
 
-const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    rut: '',
-    contraseña: '',
-  });
+type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-  const handleInputChange = (name: keyof FormData, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+type HomeScreenProps = {
+  navigation: HomeScreenNavigationProp;
+};
 
-  const handleSubmit = async () => {
-    try{
-      const response = await fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+const Stack = createStackNavigator<RootStackParamList>();
 
-      if (response.ok) {
-        router.navigate('/Home/inicio');
-      } else {
-        Alert.alert('Error', 'Hubo un problema al iniciar sesión');
-      }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Hubo un problema con la solicitud');
-    }
-  };
-
-  const windowWidth = Dimensions.get('window').width;
-  const isMobile = windowWidth < 768;
-
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
-    <View style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
-      <Image
-        source={require('@/assets/images/logo-muni.png')}
-        style={isMobile ? styles.mobileLogo : styles.desktopLogo}
-      />
-
-      <View style={isMobile ? styles.mobileForm : styles.formContainer}>
-        <Text style={styles.titulo}>Inicio de Sesion</Text>
-        <Text style={styles.subTitle}>Accede a tu cuenta</Text>
-
-        <TextInput
-          placeholder="RUT"
-          style={styles.textInput}
-          value={formData.rut}
-          onChangeText={(value) => handleInputChange('rut', value)}
-        />
-        <TextInput
-          placeholder="Contraseña"
-          secureTextEntry={true}
-          style={styles.textInput}
-          value={formData.contraseña}
-          onChangeText={(value) => handleInputChange('contraseña', value)}
-        />
-
-        <Button title='Iniciar Sesión' color="#00ae41" onPress={handleSubmit} />
+    <SafeAreaView style={styles.container}>
+      <Header />
+      <Home />
+      <View style={styles.buttonsContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Registro"
+            onPress={() => navigation.navigate('Register')}
+          />
+        </View>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Login"
+            onPress={() => navigation.navigate('Login')}
+          />
+        </View>
       </View>
-      
-      <Footer/> 
-      <StatusBar style="auto"/>
-    </View>
-
+      <Footer />
+    </SafeAreaView>
   );
-}
+};
 
-
+const AppStack = () => {
+  return (
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registro' }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Iniciar Sesión' }} />
+    </Stack.Navigator>
+  );
+};
 
 const styles = StyleSheet.create({
-  desktopContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#4CAF50',
+  },
+  buttonsContainer: {
+    position: 'absolute',
+    top: 10,   // Ubica los botones en la parte superior
+    right: 10, // Ubica los botones a la derecha
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: '10%',
-    paddingBottom: '17.3%',
-    backgroundColor: '#FFFFFF',
   },
-
-
-  mobileContainer: {
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingBottom: '10%'
+  buttonWrapper: {
+    marginLeft: 10,  // Espacio entre los botones
+    width: 80,       // Ancho de cada botón
   },
-
-  desktopLogo: {
-    width: '50%',
-    height: 'auto',
-    resizeMode: 'contain',
-  },
-
-  mobileLogo: {
-    height: '20%',
-    resizeMode: 'contain'
-  },
-
-  formContainer: {
-    width: '45%',
-  },
-
-  mobileForm: {
-    width: '100%',
-  },
-
-  titulo:{
-    marginTop: 20,
-    fontSize: 50,
-    color: '#34434D',
-    fontWeight: 'bold',
-  },
-  
-  subTitle: {
-    fontSize: 30,
-    color: 'gray',
-    marginBottom: '2%',
-  },
-  
-  textInput: {
-    padding: 10,
-    paddingStart: 30,
-    width: '100%',
-    height: 50,
-    marginTop: 10,
-    borderColor: 'black',
-    borderWidth: 1,
-    marginBottom: '5%',
-    fontSize: 20,
-  },
-
-  forgotPassword: {
-    fontSize: 14,
-    color: 'gray',
-    marginTop: 20,
-  },
-
-  button: {
-
-  },
-
 });
 
-export default LoginForm
+export default AppStack;
