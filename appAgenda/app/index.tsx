@@ -58,7 +58,7 @@ const AppStack = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#3CB371',
   },
   buttonsContainer: {
     position: 'absolute',
