@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -41,14 +40,12 @@ const Footer = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#202020',
-    paddingVertical: 5, // Reducido para un footer más pequeño
-    alignItems: 'flex-end',
+    paddingVertical: 5, // Aumentado para dar más espacio al footer
+    alignItems: 'flex-end', // Centra el contenido
     justifyContent: 'center',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    width: '100%',
   },
+  
   links: {
     flexDirection: 'row',
     justifyContent: 'space-around',
