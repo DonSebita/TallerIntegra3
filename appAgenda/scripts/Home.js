@@ -1,11 +1,12 @@
 // components/Home.js
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { Image, View, StyleSheet, Text } from 'react-native';
 import Tarjeta from './Tarjeta';
 import Tarjeta2 from './Tarjeta2';
 import Tarjeta3 from './Tarjeta3';
 import Tarjeta4 from './Tarjeta4';
 import Busqueda from './Busqueda';
+import Footer from './Footer';
 
 const Home = () => {
   return (
@@ -20,6 +21,7 @@ const Home = () => {
         <Tarjeta3 style={styles.card} />
         <Tarjeta4 style={styles.card} />
       </View>
+      <Footer/>
     </View>
   );
 };
@@ -29,6 +31,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
+    overflow: 'auto', // Agrega esto para permitir el desplazamiento
   },
   busquedaContainer: {
     marginTop: 20,

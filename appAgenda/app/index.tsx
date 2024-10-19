@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, Button, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Button, View, Image } from 'react-native';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import Header from '@/scripts/Header';
 import Home from '@/scripts/Home';
@@ -40,7 +40,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           />
         </View>
       </View>
-      <Footer />
+     
     </SafeAreaView>
   );
 };

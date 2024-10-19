@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Asegúrate de tener esta biblioteca instalada
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Footer = () => {
   const navigation = useNavigation();
@@ -12,15 +12,19 @@ const Footer = () => {
         <TouchableOpacity onPress={() => navigation.navigate('Inicio')}>
           <Text style={styles.link}>Inicio</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Support')}>
-          <Text style={styles.link}>Soporte</Text>
-        </TouchableOpacity>
+        
+        <Image
+          source={require('./logo-muni.png')} // Asegúrate de que esta ruta sea correcta
+          style={styles.logoImage} // Estilo específico para esta imagen
+        />
+        
         <TouchableOpacity onPress={() => navigation.navigate('Contacts')}>
           <Text style={styles.link}>Contactos</Text>
         </TouchableOpacity>
       </View>
       
       <View style={styles.socialContainer}>
+        <Text style={styles.link}>SIGUENOS...</Text>
         <TouchableOpacity style={styles.icon}>
           <Icon name="facebook" size={18} color="#ffffff" />
         </TouchableOpacity>
@@ -32,7 +36,10 @@ const Footer = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.copy}>© 2024 Tu Municipalidad</Text>
+      <Image
+        source={require('./sss-300x147-1.webp')} // Asegúrate de que esta ruta sea correcta
+        style={styles.footerImage} // Estilo específico para esta imagen
+      />
     </View>
   );
 };
@@ -40,12 +47,11 @@ const Footer = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#202020',
-    paddingVertical: 5, // Aumentado para dar más espacio al footer
-    alignItems: 'flex-end', // Centra el contenido
+    paddingVertical: 5,
+    alignItems: 'flex-end',
     justifyContent: 'center',
     width: '100%',
   },
-  
   links: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -54,21 +60,31 @@ const styles = StyleSheet.create({
   link: {
     color: '#ffffff',
     margin: 0,
-    fontSize: 16, // Reducido para un footer más pequeño
+    fontSize: 16,
   },
   socialContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginVertical: 5, // Reducido para un footer más pequeño
+    marginVertical: 5,
     width: '100%',
   },
   icon: {
-    marginHorizontal: 8, // Reducido para un footer más pequeño
+    marginHorizontal: 8,
+  },
+  logoImage: {
+    width: 200, // Ajusta el tamaño según lo necesites
+    height: 130, // Ajusta el tamaño según lo necesites
+    marginVertical: 5,
+  },
+  footerImage: {
+    width: 200, // Ajusta el tamaño según lo necesites
+    height: 100, // Ajusta el tamaño según lo necesites
+    marginVertical: 5,
   },
   copy: {
     color: '#ffffff',
     marginTop: 0,
-    fontSize: 14, // Reducido para un footer más pequeño
+    fontSize: 14,
   },
 });
 
