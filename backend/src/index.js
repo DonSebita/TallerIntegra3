@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { router: authRoutes, ensureAuthenticated } = require('./routes/auth.js'); // Importa las rutas de autenticación
 const calendarRoutes = require('./services/calendar.js'); // Importa las rutas de Google Calendar
 const passwordRoutes = require('./routes/passwordRoutes.js'); // Importa las rutas de restablecimiento de contraseña
+const citasRoutes = require('./routes/citasRouter.js') // Importa las rutas de gestión de citas
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -31,6 +32,9 @@ app.use('/api', calendarRoutes);
 
 // Usa las rutas de restablecimiento de contraseña
 app.use('/api/password', passwordRoutes);
+
+// Usa las rutas de gestion de citas
+app.use('/api/citas', citasRoutes)
 
 // Ruta base para verificar que el servidor está corriendo
 app.get('/', (req, res) => {
