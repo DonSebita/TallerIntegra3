@@ -1,10 +1,10 @@
-import * as React from 'react'; 
+import * as React from 'react';
 import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Footer from '@/scripts/Footer';
-import { BrowserRouter as Router, Route, Routes, BrowserRouter, useRoutes } from 'react-router-dom';
 
 // Define el tipo de datos que manejará el formulario
 interface FormData {
@@ -18,6 +18,8 @@ const LoginForm: React.FC = () => {
     contraseña: '',
   });
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Estado para el mensaje de error
+
   const handleInputChange = (name: keyof FormData, value: string) => {
     setFormData({
       ...formData,
@@ -26,7 +28,7 @@ const LoginForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    try{
+    try {
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
@@ -36,13 +38,22 @@ const LoginForm: React.FC = () => {
       });
 
       if (response.ok) {
-        router.navigate('/Home/inicio');
+        const userData = await response.json();  // Recibe los datos del usuario (incluyendo validado y rol)
+        
+        // Almacenar los datos del usuario en AsyncStorage
+        await AsyncStorage.setItem('usuario', JSON.stringify(userData));
+
+        // Redirigir a la página Home
+        router.push('/Home/home');
+      } else if (response.status === 403) {
+        // Mostrar mensaje si el usuario no está validado
+        setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
       } else {
-        Alert.alert('Error', 'Hubo un problema al iniciar sesión');
+        setErrorMessage('Hubo un problema al iniciar sesión. Verifica tus credenciales.');
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Hubo un problema con la solicitud');
+      setErrorMessage('Hubo un problema con la solicitud. Intenta nuevamente.');
     }
   };
 
@@ -75,16 +86,16 @@ const LoginForm: React.FC = () => {
         />
 
         <Button title='Iniciar Sesión' color="#00ae41" onPress={handleSubmit} />
+
+        {/* Mostrar mensaje de error si existe */}
+        {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
       </View>
-      
-      <Footer/> 
-      <StatusBar style="auto"/>
+
+      <Footer />
+      <StatusBar style="auto" />
     </View>
-
   );
-}
-
-
+};
 
 const styles = StyleSheet.create({
   desktopContainer: {
@@ -95,12 +106,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
 
-
   mobileContainer: {
     padding: 20,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingBottom: '10%'
+    paddingBottom: '10%',
   },
 
   desktopLogo: {
@@ -111,7 +121,7 @@ const styles = StyleSheet.create({
 
   mobileLogo: {
     height: '20%',
-    resizeMode: 'contain'
+    resizeMode: 'contain',
   },
 
   formContainer: {
@@ -122,19 +132,19 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
-  titulo:{
+  titulo: {
     marginTop: 20,
     fontSize: 50,
     color: '#34434D',
     fontWeight: 'bold',
   },
-  
+
   subTitle: {
     fontSize: 30,
     color: 'gray',
     marginBottom: '2%',
   },
-  
+
   textInput: {
     padding: 10,
     paddingStart: 30,
@@ -147,16 +157,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  forgotPassword: {
-    fontSize: 14,
-    color: 'gray',
-    marginTop: 20,
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 10,
+    textAlign: 'center',
   },
-
-  button: {
-
-  },
-
 });
 
-export default LoginForm
+export default LoginForm;

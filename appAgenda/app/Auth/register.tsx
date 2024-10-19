@@ -13,11 +13,10 @@ interface FormData {
   ciudad: string;
   comuna: string;
   direccion: string;
-  sector_id: string;
   telefono: string;
   celular: string;
   correo: string;
-  contraseña: string;
+  contrasena: string;  // Debe coincidir con el backend
 }
 
 const RegistroForm: React.FC = () => {
@@ -32,11 +31,10 @@ const RegistroForm: React.FC = () => {
     ciudad: '',
     comuna: '',
     direccion: '',
-    sector_id: '',
     telefono: '',
     celular: '',
     correo: '',
-    contraseña: '',
+    contrasena: '',  // Asegúrate de que el nombre coincida con el backend
   });
 
   const [currentStep, setCurrentStep] = useState(0); // Controla qué campo se muestra actualmente
@@ -52,11 +50,10 @@ const RegistroForm: React.FC = () => {
     { label: 'Ciudad', name: 'ciudad' },
     { label: 'Comuna', name: 'comuna' },
     { label: 'Dirección', name: 'direccion' },
-    { label: 'Sector ID', name: 'sector_id' },
     { label: 'Teléfono', name: 'telefono' },
     { label: 'Celular', name: 'celular' },
     { label: 'Correo', name: 'correo' },
-    { label: 'Contraseña', name: 'contraseña' },
+    { label: 'Contraseña', name: 'contrasena' },  // Debe coincidir con 'contrasena' en el backend
   ];
 
   const handleInputChange = (name: keyof FormData, value: string) => {
@@ -98,10 +95,8 @@ const RegistroForm: React.FC = () => {
   return (
     <View style={styles.container}>
       <Image
-        id="c"
-        source={require('@/assets/images/logo-muni.png')}
-        width={650}
-        height={590}
+        source={require('../../assets/images/logo-muni.png')} // Ajusta la ruta según tu estructura
+        style={styles.logo}
       />
       <View style={styles.inputContainer}>
         <Text style={styles.label}>{fields[currentStep].label}</Text>
@@ -128,8 +123,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     padding: 20,
   },
-
-  
   logo: {
     width: 650,
     height: 590,
@@ -147,14 +140,14 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 10,
     borderRadius: 5,
-    fontSize: 20, // Aumenta el tamaño de la fuente en el input
-    textAlign: 'center', // Centra el texto dentro del input
+    fontSize: 20,
+    textAlign: 'center',
   },
   label: {
-    fontSize: 24, // Tamaño de la fuente para las etiquetas
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
-    textAlign: 'center', // Alinea el texto de las etiquetas al centro
+    textAlign: 'center',
   },
 });
 

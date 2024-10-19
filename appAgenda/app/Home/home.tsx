@@ -1,53 +1,63 @@
-import React from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
-import { Link } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, View, Text, ActivityIndicator, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Link, useRouter } from 'expo-router'; // Para redirigir si no está validado
 
 const HomePage: React.FC = () => {
+  const [isValidated, setIsValidated] = useState<boolean | null>(null);  // Estado para verificar si el usuario está validado
+  const router = useRouter();  // Hook para redirigir
+
+  useEffect(() => {
+    const checkValidation = async () => {
+      try {
+        const usuarioData = await AsyncStorage.getItem('usuario');  // Recupera el usuario desde AsyncStorage
+        if (usuarioData) {
+          const usuario = JSON.parse(usuarioData);
+          if (usuario.validado) {
+            setIsValidated(true);  // Si el usuario está validado
+          } else {
+            setIsValidated(false);  // Si no está validado, redirige a la página de login
+            router.push('/Auth/Login');
+          }
+        } else {
+          setIsValidated(false);  // Si no hay usuario en AsyncStorage, redirige a la página de login
+          router.push('/Auth/Login');
+        }
+      } catch (error) {
+        console.error('Error al obtener los datos del usuario', error);
+        setIsValidated(false);
+        router.push('/Auth/Login');
+      }
+    };
+
+    checkValidation();  // Llama a la función para validar al usuario cuando el componente cargue
+  }, [router]);
+
   const windowWidth = Dimensions.get('window').width;
-  const isMobile = windowWidth < 768; // Define isMobile aquí para determinar si es móvil o no
+  const isMobile = windowWidth < 768;
+
+  // Si aún no se ha determinado si el usuario está validado, muestra un indicador de carga
+  if (isValidated === null) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <SafeAreaView style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
       {/* Logo */}
-      <Image
-        source={require('@/assets/images/logo-muni.png')}
-        style={styles.logo}
-      />
-
+      <Image source={require('@/assets/images/logo-muni.png')} style={styles.logo} />
+      
       {/* Contenedor de botones */}
       <View style={styles.buttonContainer}>
-        {/* Botón para Agendar Hora */}
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.buttonAgendar,
-            { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }
-          ]}
-        >
-          <Link href="/Auth/agenda" style={styles.buttonText}>
-            Agendar Hora
-          </Link>
+        <TouchableOpacity style={[styles.button, styles.buttonAgendar, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
+          <Link href="/Auth/agenda" style={styles.buttonText}>Agendar Hora</Link>
         </TouchableOpacity>
 
-        {/* Botón para Historial de Citas */}
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.buttonHistorial,
-            { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }
-          ]}
-        >
-          <Link href="/Home/HistorialCitas" style={styles.buttonText}>
-            Historial de Citas
-          </Link>
+        <TouchableOpacity style={[styles.button, styles.buttonHistorial, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
+          <Link href="/Home/HistorialCitas" style={styles.buttonText}>Historial de Citas</Link>
         </TouchableOpacity>
 
-        {/* Botón para Editar/Cancelar Citas */}
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.buttonEditar,{ width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
-            Editar/Cancelar Citas
+        <TouchableOpacity style={[styles.button, styles.buttonEditar, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
+          Editar/Cancelar Citas
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -73,7 +83,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 180,
     resizeMode: 'contain',
-    marginBottom: 40, // Espacio entre el logo y los botones
+    marginBottom: 40,
   },
   buttonContainer: {
     width: '100%',
@@ -81,10 +91,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    marginVertical: 20,               // Separación entre botones
-    borderRadius: 15,                 // Botones con bordes redondeados más modernos
-    backgroundColor: '#008CBA',       // Color de fondo por defecto
-    shadowColor: '#000',              // Sombra para darle un efecto más moderno
+    marginVertical: 20,
+    borderRadius: 15,
+    backgroundColor: '#008CBA',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
@@ -98,15 +108,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  // Estilos específicos para cada botón según el color
   buttonAgendar: {
-    backgroundColor: '#008CBA', // Azul
+    backgroundColor: '#008CBA',
   },
   buttonHistorial: {
-    backgroundColor: '#4CAF50', // Verde
+    backgroundColor: '#4CAF50',
   },
   buttonEditar: {
-    backgroundColor: '#f44336', // Rojo
+    backgroundColor: '#f44336',
   },
 });
 
