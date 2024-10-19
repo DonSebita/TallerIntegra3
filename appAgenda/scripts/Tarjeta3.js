@@ -12,8 +12,8 @@ const Tarjeta = () => {
             <Button mode="contained" style={styles.button} labelStyle={styles.buttonLabel}>Información</Button>
             <Button mode="contained" style={styles.button} labelStyle={styles.buttonLabel}>Documentos</Button>
           </Card.Actions>
-          <Text style={styles.text}>En Chile, el Día del Adulto Mayor</Text>
-          <Text style={styles.text}>se celebra el 1 de octubre.</Text>
+          <Text style={styles.text}>Talleres funcionales para todos los</Text>
+          <Text style={styles.text}>Adultos mayores.</Text>
         </Card.Content>
       </Card>
     </View>
