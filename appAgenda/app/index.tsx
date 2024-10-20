@@ -62,13 +62,14 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     position: 'absolute',
-    top: 10,   // Ubica los botones en la parte superior
-    right: 10, // Ubica los botones a la derecha
+    top: 5,   // Ubica los botones en la parte superior
+    right: 100, // Ubica los botones a la derecha
     flexDirection: 'row',
   },
   buttonWrapper: {
     marginLeft: 10,  // Espacio entre los botones
-    width: 80,       // Ancho de cada botón
+    width: 100,       // Ancho de cada botón
+
   },
 });
 
