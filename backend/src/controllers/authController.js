@@ -10,39 +10,42 @@ const query = promisify(db.query).bind(db);
 
 // Función para registrar un nuevo usuario
 exports.register = async (req, res) => {
-    const { rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, telefono, celular, correo, contraseña, validado } = req.body;
+    const { rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, telefono, celular, correo, contrasena } = req.body;
 
     // Verifica que todos los campos requeridos están presentes
-    if (!rut || !primer_nombre || !apellido_paterno || !correo || !contraseña) {
+    if (!rut || !primer_nombre || !apellido_paterno || !correo || !contrasena) {
         return res.status(400).send('Faltan campos requeridos.');
     }
 
     // Encripta la contraseña
-    const hashedPassword = await bcrypt.hash(contraseña, 10);
+    const hashedPassword = await bcrypt.hash(contrasena, 10);
+
+    const rol = 'usuario'; // Rol por defecto es 'usuario'
+    const validado = 1;    // Para tinyint(1), usamos 1 para indicar que el usuario está validado
 
     const insertUserQuery = `
       INSERT INTO usuarios 
         (rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, 
         apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, 
-        telefono, celular, correo, contraseña, validado) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        telefono, celular, correo, contrasena, validado, rol) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
         rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno,
         apellido_materno, fecha_nacimiento, ciudad, comuna, direccion,
-        telefono, celular, correo, hashedPassword, validado
+        telefono, celular, correo, hashedPassword, validado, rol
     ];
 
     try {
         await query(insertUserQuery, values);
         res.status(201).send('Usuario registrado exitosamente.');
-
-        console.log('POST - register: Se ingreso el usuario a la base de datos')
+        console.log('POST - register: Se ingresó el usuario a la base de datos');
     } catch (err) {
         console.error('Error al insertar el usuario en la base de datos:', err);
         res.status(500).send('Error al registrar el usuario.');
     }
 };
+
 
 // Función para manejar el login
 exports.login = async (req, res) => {
@@ -53,25 +56,33 @@ exports.login = async (req, res) => {
     }
 
     try {
-        const results = await query('SELECT * FROM usuarios where rut = ?', [rut]);
+        const results = await query('SELECT * FROM usuarios WHERE rut = ?', [rut]);
         
-        if (results.length === 0) return res.status(401).send('Usuario no encontrado');
+        if (results.length === 0) {
+            return res.status(401).send('Usuario no encontrado');
+        }
 
-        const user = results[0]; // obtener el usuario encontrado
-        
-        const match = await bcrypt.compare(contraseña, user.contraseña);
+        const user = results[0]; // Obtener el usuario encontrado
+
+        const match = await bcrypt.compare(contraseña, user.contrasena);  // Asegúrate de usar "contrasena" si así está en la base de datos
         
         if (!match) {
-            return res.status(401).send('Contraseña incorrecta');
+            return res.status(401).send({succes:false, message:'Contraseña incorrecta'});
+        } else if (user.validado !== 1) {
+            // Verificar que el usuario esté validado (validado debe ser 1 en la BD)
+            return res.status(403).send({success:false, message:'Tu cuenta no ha sido validada. Contacta al administrador.'});
         } else {
-            console.log('POST - login: El usuario inicio sesión correctamente')
-            return res.status(200).send('Sesión iniciada correctamente');
+            console.log('POST - login: El usuario inició sesión correctamente');
+            
+            // Retorna el rol y la validación para usar en el frontend
+            return res.status(200).json({message: 'Sesión iniciada correctamente', rol: user.rol, validado: user.validado,success:true });
         }
     } catch (err) {
-        console.error(err);
+        console.error('Error en el proceso de login:', err);
         return res.status(500).send('Error en el servidor');
     }
 };
+
 
 // Función para solicitar restablecimiento de contraseña
 exports.forgotPassword = async (req, res) => {

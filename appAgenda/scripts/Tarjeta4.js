@@ -7,13 +7,13 @@ const Tarjeta = () => {
     <View style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
-          <Card.Cover source={{ uri: 'https://images.ligup2.com/eyJidWNrZXQiOiJsaWd1cC12MiIsImtleSI6ImRlcG9ydGVtdW5pY2lwYWwvcGhvdG9zLzUyNzI1X2dpbS5fbWlsbGFyYXlfMy5wbmciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImZpdCI6ImNvdmVyIn0sInJvdGF0ZSI6bnVsbH19' }} />
+          <Card.Cover source={{ uri: 'https://images.ligup2.com/eyJidWNrZXQiOiJsaWd1cC12MiIsImtleSI6ImRlcG9ydGVtdW5pY2lwYWwvcGhvdG9zLzIzMDc0X3ltY2EucG5nIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjoxMjAwLCJmaXQiOiJjb3ZlciJ9LCJyb3RhdGUiOm51bGx9fQ==' }} />
           <Card.Actions>
             <Button mode="contained" style={styles.button} labelStyle={styles.buttonLabel}>Información</Button>
             <Button mode="contained" style={styles.button} labelStyle={styles.buttonLabel}>Documentos</Button>
           </Card.Actions>
-          <Text style={styles.text}>En temuco talleres de</Text>
-          <Text style={styles.text}>Gimnasia, informate.</Text>
+          <Text style={styles.text}>Adulto Mayor participa en</Text>
+          <Text style={styles.text}>El novedoso hidrogimnasio.</Text>
         </Card.Content>
       </Card>
     </View>
