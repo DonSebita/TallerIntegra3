@@ -67,15 +67,15 @@ exports.login = async (req, res) => {
         const match = await bcrypt.compare(contraseña, user.contrasena);  // Asegúrate de usar "contrasena" si así está en la base de datos
         
         if (!match) {
-            return res.status(401).send('Contraseña incorrecta');
+            return res.status(401).send({succes:false, message:'Contraseña incorrecta'});
         } else if (user.validado !== 1) {
             // Verificar que el usuario esté validado (validado debe ser 1 en la BD)
-            return res.status(403).send('Tu cuenta no ha sido validada. Contacta al administrador.');
+            return res.status(403).send({success:false, message:'Tu cuenta no ha sido validada. Contacta al administrador.'});
         } else {
             console.log('POST - login: El usuario inició sesión correctamente');
             
             // Retorna el rol y la validación para usar en el frontend
-            return res.status(200).json({ message: 'Sesión iniciada correctamente', rol: user.rol, validado: user.validado });
+            return res.status(200).json({message: 'Sesión iniciada correctamente', rol: user.rol, validado: user.validado,success:true });
         }
     } catch (err) {
         console.error('Error en el proceso de login:', err);

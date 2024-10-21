@@ -1,12 +1,13 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 require('dotenv').config();  // Asegúrate de cargar las variables de entorno
 
 // Crear la conexión a la base de datos
 const db = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',   // Asegúrate de que este usuario es correcto
-  password: process.env.DB_PASSWORD || '',  // Asegúrate de que la contraseña es correcta
-  database: process.env.DB_NAME || 'prueba_1'  // Verifica que el nombre de la base de datos es correcto
+  host: '45.236.129.172',
+  user: 'ti',  
+  password: 'tallerIntegracion3',  
+  database: 'Ti3', 
+  port: 3306,
 });
 
 db.connect((err) => {
