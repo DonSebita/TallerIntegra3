@@ -7,19 +7,23 @@ const query = promisify(db.query).bind(db);
 
 // Función para registrar un nuevo usuario
 exports.crearCita = async (req, res) => {
-    const { fecha_cita } = req.body;
+    const { servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, movilizacion_id } = req.body;
 
     // Verifica que el campo requerido esta precente
     if (!fecha_cita) {
-        return res.status(400).send('Falta el campo requerido.');
+        return res.status(400).send('Faltan campos requeridos.');
     }
 
-    const insertUserQuery = `
-      INSERT INTO Citas 
-        (fecha_cita) 
-      VALUES (?)`;
+    const estado_cita = 'sin confirmar';
 
-    const values = [fecha_cita];
+    const insertUserQuery = `
+      INSERT INTO citas 
+        (fecha_cita, citas_canceladas, estado_cita) 
+      VALUES (?, ?, ?)`;
+
+    const values = [
+      fecha_cita, 0, estado_cita
+    ];
 
     try {
         await query(insertUserQuery, values);
