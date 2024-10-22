@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react'; 
+import { View, StyleSheet, Platform, Alert } from 'react-native';
 import { TextInput, Button, Modal, Portal, Text, Provider } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -25,9 +25,35 @@ const AgendarHora: React.FC = () => {
     if (time) setSelectedTime(time);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     hideModal();
-    console.log('Agendado:', { name, email, selectedDate, selectedTime });
+    
+    // Crear el objeto con los datos de la cita
+    const cita = {
+      name,
+      email,
+      fecha_cita: selectedDate.toISOString().split('T')[0], // Convertir a formato de fecha
+      hora_cita: selectedTime.toISOString().split('T')[1],   // Obtener la hora
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/api/citas/crear-cita', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cita),
+      });
+
+      if (response.ok) {
+        Alert.alert('Cita Agendada', 'La cita ha sido agendada con éxito.');
+      } else {
+        Alert.alert('Error', 'Hubo un problema al agendar la cita. Inténtalo de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error al agendar la cita:', error);
+      Alert.alert('Error', 'Hubo un error al conectarse con el servidor.');
+    }
   };
 
   return (

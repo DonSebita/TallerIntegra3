@@ -1,178 +1,142 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, Alert, Dimensions } from 'react-native';
-import { router } from 'expo-router';
+import React, { useState } from 'react'; 
+import { View, StyleSheet, Platform, Alert } from 'react-native';
+import { TextInput, Button, Modal, Portal, Text, Provider } from 'react-native-paper';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-// Define el tipo de datos que manejará el formulario
-interface FormData {
-  rut: string;
-  primer_nombre: string;
-  segundo_nombre: string;
-  tercer_nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  fecha_nacimiento: string;
-  ciudad: string;
-  comuna: string;
-  direccion: string;
-  telefono: string;
-  celular: string;
-  correo: string;
-  contrasena: string;  // Debe coincidir con el backend
-}
+const AgendarHora: React.FC = () => {
+  const [visible, setVisible] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedTime, setSelectedTime] = useState<Date>(new Date());
+  const [timePickerVisible, setTimePickerVisible] = useState<boolean>(false);
+  const [datePickerVisible, setDatePickerVisible] = useState<boolean>(false);
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
 
-const RegistroForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    rut: '',
-    primer_nombre: '',
-    segundo_nombre: '',
-    tercer_nombre: '',
-    apellido_paterno: '',
-    apellido_materno: '',
-    fecha_nacimiento: '',
-    ciudad: '',
-    comuna: '',
-    direccion: '',
-    telefono: '',
-    celular: '',
-    correo: '',
-    contrasena: '',  // Asegúrate de que el nombre coincida con el backend
-  });
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
-  const [currentStep, setCurrentStep] = useState(0); // Controla qué campo se muestra actualmente
-
-  // Detecta el ancho de la pantalla para ajustar el diseño
-  const windowWidth = Dimensions.get('window').width;
-  const isMobile = windowWidth < 768;  // Considera una pantalla móvil si es menor a 768px
-
-  const fields = [
-    { label: 'RUT', name: 'rut' },
-    { label: 'Primer Nombre', name: 'primer_nombre' },
-    { label: 'Segundo Nombre', name: 'segundo_nombre' },
-    { label: 'Tercer Nombre', name: 'tercer_nombre' },
-    { label: 'Apellido Paterno', name: 'apellido_paterno' },
-    { label: 'Apellido Materno', name: 'apellido_materno' },
-    { label: 'Fecha de Nacimiento', name: 'fecha_nacimiento' },
-    { label: 'Ciudad', name: 'ciudad' },
-    { label: 'Comuna', name: 'comuna' },
-    { label: 'Dirección', name: 'direccion' },
-    { label: 'Teléfono', name: 'telefono' },
-    { label: 'Celular', name: 'celular' },
-    { label: 'Correo', name: 'correo' },
-    { label: 'Contraseña', name: 'contrasena' },  // Debe coincidir con 'contrasena' en el backend
-  ];
-
-  const handleInputChange = (name: keyof FormData, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+  const handleDateChange = (event: any, date?: Date | undefined) => {
+    setDatePickerVisible(false);
+    if (date) setSelectedDate(date);
   };
 
-  const handleNext = () => {
-    if (currentStep < fields.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleSubmit(); // Enviar el formulario cuando se alcance el último paso
-    }
+  const handleTimeChange = (event: any, time?: Date | undefined) => {
+    setTimePickerVisible(false);
+    if (time) setSelectedTime(time);
   };
 
   const handleSubmit = async () => {
+    hideModal();
+    
+    // Crear el objeto con los datos de la cita
+    const cita = {
+      name,
+      email,
+      fecha_cita: selectedDate.toISOString().split('T')[0], // Convertir a formato de fecha
+      hora_cita: selectedTime.toISOString().split('T')[1],   // Obtener la hora
+    };
+
     try {
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch('http://localhost:3000/api/citas/crear-cita', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(cita),
       });
 
       if (response.ok) {
-        Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
-        router.push('/');  
+        Alert.alert('Cita Agendada', 'La cita ha sido agendada con éxito.');
       } else {
-        Alert.alert('Error', 'Hubo un problema al registrarse');
+        Alert.alert('Error', 'Hubo un problema al agendar la cita. Inténtalo de nuevo.');
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Hubo un problema en la conexión');
+      console.error('Error al agendar la cita:', error);
+      Alert.alert('Error', 'Hubo un error al conectarse con el servidor.');
     }
   };
 
   return (
-    <View style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
-      <Image
-        source={require('../../assets/images/logo-muni.png')} // Ajusta la ruta según tu estructura
-        style={isMobile ? styles.mobileLogo : styles.desktopLogo}
-      />
-      <View style={isMobile ? styles.mobileInputContainer : styles.desktopInputContainer}>
-        <Text style={styles.label}>{fields[currentStep].label}</Text>
-        <TextInput
-          style={styles.input}
-          value={formData[fields[currentStep].name as keyof FormData]}
-          onChangeText={(value) => handleInputChange(fields[currentStep].name as keyof FormData, value)}
-          placeholder={`Ingrese ${fields[currentStep].label}`}
-        />
-        <Button
-          title={currentStep < fields.length - 1 ? 'Siguiente' : 'Registrar'}
-          onPress={handleNext}
-        />
+    <Provider>
+      <View style={styles.container}>
+        <Button mode="contained" onPress={showModal}>Agendar Hora</Button>
+
+        <Portal>
+          <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.modal}>
+            <Text style={styles.title}>Agendar una nueva hora</Text>
+
+            <TextInput
+              label="Nombre"
+              value={name}
+              onChangeText={text => setName(text)}
+              style={styles.input}
+            />
+
+            <TextInput
+              label="Correo Electrónico"
+              value={email}
+              onChangeText={text => setEmail(text)}
+              style={styles.input}
+            />
+
+            <Button mode="outlined" onPress={() => setDatePickerVisible(true)} style={styles.input}>
+              Seleccionar Fecha: {selectedDate.toLocaleDateString()}
+            </Button>
+
+            <Button mode="outlined" onPress={() => setTimePickerVisible(true)} style={styles.input}>
+              Seleccionar Hora: {selectedTime.toLocaleTimeString()}
+            </Button>
+
+            {datePickerVisible && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleDateChange}
+              />
+            )}
+
+            {timePickerVisible && (
+              <DateTimePicker
+                value={selectedTime}
+                mode="time"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleTimeChange}
+              />
+            )}
+
+            <Button mode="contained" onPress={handleSubmit} style={styles.submitButton}>
+              Confirmar Agendamiento
+            </Button>
+          </Modal>
+        </Portal>
       </View>
-    </View>
+    </Provider>
   );
 };
 
 const styles = StyleSheet.create({
-  desktopContainer: {
+  container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2',
     padding: 20,
   },
-  mobileContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2',
-    padding: 10,
+  modal: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 20,
   },
-  desktopLogo: {
-    width: 400,
-    height: 260,
+  title: {
+    fontSize: 18,
     marginBottom: 20,
-  },
-  mobileLogo: {
-    width: 200,
-    height: 110,
-    marginBottom: 20,
-  },
-  desktopInputContainer: {
-    width: '40%',
-    marginBottom: 20,
-    justifyContent: 'center',
-  },
-  mobileInputContainer: {
-    width: '90%',
-    marginBottom: 20,
-    justifyContent: 'center',
+    textAlign: 'center',
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 20, // Aumenta el padding para hacerlo más cómodo
-    marginVertical: 10,
-    borderRadius: 5,
-    fontSize: 24, // Letra más grande
-    textAlign: 'center',
-    fontFamily: 'Helvetica', // Usa la fuente Helvetica
-  },
-  label: {
-    fontSize: 30,  // Letra más grande para los títulos
-    fontWeight: 'bold',
     marginBottom: 10,
-    textAlign: 'center',
-    fontFamily: 'Helvetica',  // Usa la fuente Helvetica
+  },
+  submitButton: {
+    marginTop: 20,
   },
 });
 
-export default RegistroForm;
+export default AgendarHora;

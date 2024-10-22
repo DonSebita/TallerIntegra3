@@ -58,6 +58,7 @@ const HomePage: React.FC = () => {
 
         <TouchableOpacity style={[styles.button, styles.buttonEditar, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
           Editar/Cancelar Citas
+          <Link href="/Home/EditarCitas" style={styles.buttonText}>Editar/Cancelar Citas</Link>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
