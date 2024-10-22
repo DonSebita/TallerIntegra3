@@ -1,65 +1,24 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, Alert, Dimensions } from 'react-native';
+import * as React from 'react';
+import { useState } from 'react';
+import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Footer from '@/scripts/Footer';
 
 // Define el tipo de datos que manejará el formulario
 interface FormData {
   rut: string;
-  primer_nombre: string;
-  segundo_nombre: string;
-  tercer_nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  fecha_nacimiento: string;
-  ciudad: string;
-  comuna: string;
-  direccion: string;
-  telefono: string;
-  celular: string;
-  correo: string;
-  contrasena: string;  // Debe coincidir con el backend
+  contraseña: string;
 }
 
-const RegistroForm: React.FC = () => {
+const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     rut: '',
-    primer_nombre: '',
-    segundo_nombre: '',
-    tercer_nombre: '',
-    apellido_paterno: '',
-    apellido_materno: '',
-    fecha_nacimiento: '',
-    ciudad: '',
-    comuna: '',
-    direccion: '',
-    telefono: '',
-    celular: '',
-    correo: '',
-    contrasena: '',  // Asegúrate de que el nombre coincida con el backend
+    contraseña: '',
   });
 
-  const [currentStep, setCurrentStep] = useState(0); // Controla qué campo se muestra actualmente
-
-  // Detecta el ancho de la pantalla para ajustar el diseño
-  const windowWidth = Dimensions.get('window').width;
-  const isMobile = windowWidth < 768;  // Considera una pantalla móvil si es menor a 768px
-
-  const fields = [
-    { label: 'RUT', name: 'rut' },
-    { label: 'Primer Nombre', name: 'primer_nombre' },
-    { label: 'Segundo Nombre', name: 'segundo_nombre' },
-    { label: 'Tercer Nombre', name: 'tercer_nombre' },
-    { label: 'Apellido Paterno', name: 'apellido_paterno' },
-    { label: 'Apellido Materno', name: 'apellido_materno' },
-    { label: 'Fecha de Nacimiento', name: 'fecha_nacimiento' },
-    { label: 'Ciudad', name: 'ciudad' },
-    { label: 'Comuna', name: 'comuna' },
-    { label: 'Dirección', name: 'direccion' },
-    { label: 'Teléfono', name: 'telefono' },
-    { label: 'Celular', name: 'celular' },
-    { label: 'Correo', name: 'correo' },
-    { label: 'Contraseña', name: 'contrasena' },  // Debe coincidir con 'contrasena' en el backend
-  ];
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Estado para el mensaje de error
 
   const handleInputChange = (name: keyof FormData, value: string) => {
     setFormData({
@@ -68,17 +27,9 @@ const RegistroForm: React.FC = () => {
     });
   };
 
-  const handleNext = () => {
-    if (currentStep < fields.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleSubmit(); // Enviar el formulario cuando se alcance el último paso
-    }
-  };
-
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,92 +38,133 @@ const RegistroForm: React.FC = () => {
       });
 
       if (response.ok) {
-        Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
-        router.push('/');  
+        const userData = await response.json();  // Recibe los datos del usuario (incluyendo token JWT)
+
+        // Almacenar el token JWT en AsyncStorage
+        if (userData.token) {
+          await AsyncStorage.setItem('token', userData.token);
+        }
+
+        // Redirigir a la página Home
+        router.push('/Home/home');
+      } else if (response.status === 403) {
+        // Mostrar mensaje si el usuario no está validado
+        setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
       } else {
-        Alert.alert('Error', 'Hubo un problema al registrarse');
+        setErrorMessage('Hubo un problema al iniciar sesión. Verifica tus credenciales.');
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Hubo un problema en la conexión');
+      setErrorMessage('Hubo un problema con la solicitud. Intenta nuevamente.');
     }
   };
+
+  const windowWidth = Dimensions.get('window').width;
+  const isMobile = windowWidth < 768;
 
   return (
     <View style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
       <Image
-        source={require('../../assets/images/logo-muni.png')} // Ajusta la ruta según tu estructura
+        source={require('@/assets/images/logo-muni.png')}
         style={isMobile ? styles.mobileLogo : styles.desktopLogo}
       />
-      <View style={isMobile ? styles.mobileInputContainer : styles.desktopInputContainer}>
-        <Text style={styles.label}>{fields[currentStep].label}</Text>
+
+      <View style={isMobile ? styles.mobileForm : styles.formContainer}>
+        <Text style={styles.titulo}>Inicio de Sesion</Text>
+        <Text style={styles.subTitle}>Accede a tu cuenta</Text>
+
         <TextInput
-          style={styles.input}
-          value={formData[fields[currentStep].name as keyof FormData]}
-          onChangeText={(value) => handleInputChange(fields[currentStep].name as keyof FormData, value)}
-          placeholder={`Ingrese ${fields[currentStep].label}`}
+          placeholder="RUT"
+          style={styles.textInput}
+          value={formData.rut}
+          onChangeText={(value) => handleInputChange('rut', value)}
         />
-        <Button
-          title={currentStep < fields.length - 1 ? 'Siguiente' : 'Registrar'}
-          onPress={handleNext}
+        <TextInput
+          placeholder="Contraseña"
+          secureTextEntry={true}
+          style={styles.textInput}
+          value={formData.contraseña}
+          onChangeText={(value) => handleInputChange('contraseña', value)}
         />
+
+        <Button title='Iniciar Sesión' color="#00ae41" onPress={handleSubmit} />
+
+        {/* Mostrar mensaje de error si existe */}
+        {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
       </View>
+
+      <Footer />
+      <StatusBar style="auto" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   desktopContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2',
-    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: '10%',
+    paddingBottom: '17.3%',
+    backgroundColor: '#FFFFFF',
   },
+
   mobileContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    padding: 20,
     alignItems: 'center',
-    backgroundColor: '#f2f2f2',
-    padding: 10,
+    justifyContent: 'flex-start',
+    paddingBottom: '10%',
   },
+
   desktopLogo: {
-    width: 400,
-    height: 260,
-    marginBottom: 20,
+    width: '50%',
+    height: 'auto',
+    resizeMode: 'contain',
   },
+
   mobileLogo: {
-    width: 200,
-    height: 110,
-    marginBottom: 20,
+    height: '20%',
+    resizeMode: 'contain',
   },
-  desktopInputContainer: {
-    width: '40%',
-    marginBottom: 20,
-    justifyContent: 'center',
+
+  formContainer: {
+    width: '45%',
   },
-  mobileInputContainer: {
-    width: '90%',
-    marginBottom: 20,
-    justifyContent: 'center',
+
+  mobileForm: {
+    width: '100%',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 20, // Aumenta el padding para hacerlo más cómodo
-    marginVertical: 10,
-    borderRadius: 5,
-    fontSize: 24, // Letra más grande
-    textAlign: 'center',
-    fontFamily: 'Helvetica', // Usa la fuente Helvetica
-  },
-  label: {
-    fontSize: 30,  // Letra más grande para los títulos
+
+  titulo: {
+    marginTop: 20,
+    fontSize: 50,
+    color: '#34434D',
     fontWeight: 'bold',
-    marginBottom: 10,
+  },
+
+  subTitle: {
+    fontSize: 30,
+    color: 'gray',
+    marginBottom: '2%',
+  },
+
+  textInput: {
+    padding: 10,
+    paddingStart: 30,
+    width: '100%',
+    height: 50,
+    marginTop: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    marginBottom: '5%',
+    fontSize: 20,
+  },
+
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 10,
     textAlign: 'center',
-    fontFamily: 'Helvetica',  // Usa la fuente Helvetica
   },
 });
 
-export default RegistroForm;
+export default LoginForm;
