@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image, Alert, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Footer from '@/scripts/Footer';
 
 // Define el tipo de datos que manejará el formulario
 interface FormData {
@@ -38,11 +38,17 @@ const LoginForm: React.FC = () => {
       });
 
       if (response.ok) {
-        const userData = await response.json();  // Recibe los datos del usuario (incluyendo validado y rol)
-        await AsyncStorage.setItem('usuario', JSON.stringify(userData));
+        const userData = await response.json();  // Recibe los datos del usuario (incluyendo token JWT)
 
+        // Almacenar el token JWT en AsyncStorage
+        if (userData.token) {
+          await AsyncStorage.setItem('token', userData.token);
+        }
+
+        // Redirigir a la página Home
         router.push('/Home/home');
       } else if (response.status === 403) {
+        // Mostrar mensaje si el usuario no está validado
         setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
       } else {
         setErrorMessage('Hubo un problema al iniciar sesión. Verifica tus credenciales.');
@@ -64,7 +70,7 @@ const LoginForm: React.FC = () => {
       />
 
       <View style={isMobile ? styles.mobileForm : styles.formContainer}>
-        <Text style={styles.titulo}>Inicio de Sesión</Text>
+        <Text style={styles.titulo}>Inicio de Sesion</Text>
         <Text style={styles.subTitle}>Accede a tu cuenta</Text>
 
         <TextInput
@@ -83,19 +89,18 @@ const LoginForm: React.FC = () => {
 
         <Button title='Iniciar Sesión' color="#00ae41" onPress={handleSubmit} />
 
+        {/* Mostrar mensaje de error si existe */}
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-        {/* Enlace para recuperar contraseña */}
+        {/* Opción para recuperar la contraseña */}
         <TouchableOpacity onPress={() => router.push('../Auth/OlvidarContrasena')}>
           <Text style={styles.forgotPassword}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
       </View>
 
       <StatusBar style="auto" />
-
     </View>
   );
-  
 };
 
 const styles = StyleSheet.create({
@@ -167,8 +172,8 @@ const styles = StyleSheet.create({
 
   forgotPassword: {
     fontSize: 16,
-    color: '#007bff',
-    marginTop: 20,
+    color: '#007AFF',
+    marginTop: 10,
     textAlign: 'center',
   },
 });
