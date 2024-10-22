@@ -7,7 +7,7 @@ const query = promisify(db.query).bind(db);
 
 // Función para registrar un nuevo usuario
 exports.crearCita = async (req, res) => {
-    const { servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, hora_cita, movilizacion_id } = req.body;
+    const { servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, movilizacion_id } = req.body;
 
     // Verifica que el campo requerido esta precente
     if (!fecha_cita) {
@@ -15,7 +15,6 @@ exports.crearCita = async (req, res) => {
     }
 
     const estado_cita = 'sin confirmar';
-    const fecha = fecha_cita + ' ' + hora_cita;
 
     const insertUserQuery = `
       INSERT INTO citas 
@@ -23,7 +22,7 @@ exports.crearCita = async (req, res) => {
       VALUES (?, ?, ?)`;
 
     const values = [
-      fecha, 0, estado_cita
+      fecha_cita, 0, estado_cita
     ];
 
     try {
