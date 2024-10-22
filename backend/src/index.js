@@ -5,6 +5,7 @@ const { router: authRoutes, ensureAuthenticated } = require('./routes/auth.js');
 const calendarRoutes = require('./services/calendar.js'); // Importa las rutas de Google Calendar
 const passwordRoutes = require('./routes/passwordRoutes.js'); // Importa las rutas de restablecimiento de contraseña
 const citasRoutes = require('./routes/citasRouter.js') // Importa las rutas de gestión de citas
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,6 +18,9 @@ const corsOptions = {
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true, // Permite el uso de credenciales (si es necesario)
 };
+
+// Aplica el authMiddleware a las rutas que quieres proteger
+app.use(authMiddleware);  // Desde aquí en adelante, todas las rutas estarán protegidas
 
 // Usa el middleware CORS
 app.use(cors(corsOptions));

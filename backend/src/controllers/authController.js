@@ -3,10 +3,14 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const db = require('../config/db.js');
+const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 
 // Convertir `db.query` a una promesa
 const query = promisify(db.query).bind(db);
+
+// Secret para JWT (debería estar en tu archivo .env)
+const JWT_SECRET = process.env.JWT_SECRET || 'clave_ejemplo';
 
 // Función para registrar un nuevo usuario
 exports.register = async (req, res) => {
@@ -46,7 +50,6 @@ exports.register = async (req, res) => {
     }
 };
 
-
 // Función para manejar el login
 exports.login = async (req, res) => {
     const { rut, contraseña } = req.body;
@@ -57,7 +60,7 @@ exports.login = async (req, res) => {
 
     try {
         const results = await query('SELECT * FROM usuarios WHERE rut = ?', [rut]);
-        
+
         if (results.length === 0) {
             return res.status(401).send('Usuario no encontrado');
         }
@@ -65,24 +68,42 @@ exports.login = async (req, res) => {
         const user = results[0]; // Obtener el usuario encontrado
 
         const match = await bcrypt.compare(contraseña, user.contrasena);  // Asegúrate de usar "contrasena" si así está en la base de datos
-        
+
         if (!match) {
-            return res.status(401).send({succes:false, message:'Contraseña incorrecta'});
+            return res.status(401).send({ success: false, message: 'Contraseña incorrecta' });
         } else if (user.validado !== 1) {
             // Verificar que el usuario esté validado (validado debe ser 1 en la BD)
-            return res.status(403).send({success:false, message:'Tu cuenta no ha sido validada. Contacta al administrador.'});
+            return res.status(403).send({ success: false, message: 'Tu cuenta no ha sido validada. Contacta al administrador.' });
         } else {
             console.log('POST - login: El usuario inició sesión correctamente');
-            
-            // Retorna el rol y la validación para usar en el frontend
-            return res.status(200).json({message: 'Sesión iniciada correctamente', rol: user.rol, validado: user.validado,success:true });
+
+            // Crear el payload para el token
+            const payload = {
+                userId: user.usuario_id,
+                rut: user.rut,
+                rol: user.rol
+            };
+
+            // Generar el token JWT
+            const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' }); // El token expira en 1 hora
+
+            // Log para verificar que el token se generó correctamente
+            console.log('JWT Token generado:', token);
+
+            // Retorna el token JWT al frontend
+            return res.status(200).json({
+                success: true,
+                message: 'Sesión iniciada correctamente',
+                token: token, // Enviar el token al frontend
+                rol: user.rol,
+                validado: user.validado
+            });
         }
     } catch (err) {
         console.error('Error en el proceso de login:', err);
         return res.status(500).send('Error en el servidor');
     }
 };
-
 
 // Función para solicitar restablecimiento de contraseña
 exports.forgotPassword = async (req, res) => {
@@ -133,6 +154,7 @@ exports.forgotPassword = async (req, res) => {
     }
 };
 
+// Función para restablecer la contraseña
 exports.resetPassword = async (req, res) => {
     const { token } = req.params;
     const { contraseña } = req.body;
@@ -142,7 +164,6 @@ exports.resetPassword = async (req, res) => {
         const results = await query('SELECT * FROM usuarios WHERE reset_token = ?', [token]);
 
         if (results.length === 0) {
-            // Si no se encuentra el token, el problema es el token inválido
             console.log("Token no válido.");
             return res.status(400).json({ message: 'Token no válido.' });
         }
@@ -151,22 +172,15 @@ exports.resetPassword = async (req, res) => {
 
         // Verificar si el token ha expirado
         if (Date.now() > user.reset_token_expiration) {
-            // Si la hora actual es mayor que el tiempo de expiración, el problema es la fecha
             console.log("El token ha expirado.");
-            console.log("Hora actual: ", Date.now());
-            console.log("Expiración del token almacenado: ", user.reset_token_expiration);
             return res.status(400).json({ message: 'El token ha expirado.' });
         }
-
-        // Si ambos verifican bien, continúa con el proceso de restablecimiento de contraseña
-        console.log("Token válido y dentro de la fecha de expiración.");
-        console.log("Usuario encontrado con el token:", user.correo);
 
         // Encriptar la nueva contraseña
         const hashedPassword = await bcrypt.hash(contraseña, 10);
 
         // Actualizar la contraseña y borrar los campos de token
-        await query('UPDATE usuarios SET contraseña = ?, reset_token = NULL, reset_token_expiration = NULL WHERE correo = ?', [hashedPassword, user.correo]);
+        await query('UPDATE usuarios SET contrasena = ?, reset_token = NULL, reset_token_expiration = NULL WHERE correo = ?', [hashedPassword, user.correo]);
 
         res.status(200).json({ message: 'Contraseña restablecida con éxito.' });
 

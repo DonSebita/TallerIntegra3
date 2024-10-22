@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, Alert } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Image, Alert, Dimensions } from 'react-native';
+import { router } from 'expo-router';
 
 // Define el tipo de datos que manejará el formulario
 interface FormData {
@@ -38,6 +39,10 @@ const RegistroForm: React.FC = () => {
   });
 
   const [currentStep, setCurrentStep] = useState(0); // Controla qué campo se muestra actualmente
+
+  // Detecta el ancho de la pantalla para ajustar el diseño
+  const windowWidth = Dimensions.get('window').width;
+  const isMobile = windowWidth < 768;  // Considera una pantalla móvil si es menor a 768px
 
   const fields = [
     { label: 'RUT', name: 'rut' },
@@ -82,7 +87,8 @@ const RegistroForm: React.FC = () => {
       });
 
       if (response.ok) {
-        Alert.alert('Registro exitoso', '¡Bienvenido!');
+        Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
+        router.push('/');  
       } else {
         Alert.alert('Error', 'Hubo un problema al registrarse');
       }
@@ -93,12 +99,12 @@ const RegistroForm: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
       <Image
         source={require('../../assets/images/logo-muni.png')} // Ajusta la ruta según tu estructura
-        style={styles.logo}
+        style={isMobile ? styles.mobileLogo : styles.desktopLogo}
       />
-      <View style={styles.inputContainer}>
+      <View style={isMobile ? styles.mobileInputContainer : styles.desktopInputContainer}>
         <Text style={styles.label}>{fields[currentStep].label}</Text>
         <TextInput
           style={styles.input}
@@ -116,38 +122,56 @@ const RegistroForm: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  desktopContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f2f2f2',
     padding: 20,
   },
-  logo: {
-    width: 650,
-    height: 590,
+  mobileContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    padding: 10,
+  },
+  desktopLogo: {
+    width: 400,
+    height: 260,
     marginBottom: 20,
   },
-  inputContainer: {
+  mobileLogo: {
+    width: 200,
+    height: 110,
+    marginBottom: 20,
+  },
+  desktopInputContainer: {
     width: '40%',
     marginBottom: 20,
-    height: 200,
+    justifyContent: 'center',
+  },
+  mobileInputContainer: {
+    width: '90%',
+    marginBottom: 20,
     justifyContent: 'center',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 15,
+    padding: 20, // Aumenta el padding para hacerlo más cómodo
     marginVertical: 10,
     borderRadius: 5,
-    fontSize: 20,
+    fontSize: 24, // Letra más grande
     textAlign: 'center',
+    fontFamily: 'Helvetica', // Usa la fuente Helvetica
   },
   label: {
-    fontSize: 24,
+    fontSize: 30,  // Letra más grande para los títulos
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    fontFamily: 'Helvetica',  // Usa la fuente Helvetica
   },
 });
 
