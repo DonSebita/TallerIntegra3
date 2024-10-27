@@ -19,7 +19,7 @@ const corsOptions = {
   credentials: true, // Permite el uso de credenciales (si es necesario)
 };
 
-// Usa el middleware CORS
+
 app.use(cors(corsOptions));
 
 // Middleware para procesar solicitudes JSON

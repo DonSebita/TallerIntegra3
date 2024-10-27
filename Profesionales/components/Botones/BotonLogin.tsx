@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Pressable, View } from "react-native";
+import { Text, StyleSheet, Pressable } from "react-native";
 import { useState } from "react";
 
 const Boton = ({ onPress, text }: any) => {
