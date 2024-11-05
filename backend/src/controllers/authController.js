@@ -136,7 +136,7 @@ exports.forgotPassword = async (req, res) => {
         });
 
         // URL para restablecer la contraseña
-        const resetURL = `http://localhost:3000/api/password/reset-password/${resetToken}`;
+        const resetURL = `Este es tu código de restablecimiento de contraseña: ${resetToken}`;
         console.log("URL de restablecimiento con token: ", resetURL);  // Asegúrate de que el token es el correcto
         const message = `Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar: \n\n ${resetURL}`;
 

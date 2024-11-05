@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const OlvidarContraseña: React.FC = () => {
+  const router = useRouter();
   const [email, setEmail] = useState<string>('');
 
   const handlePasswordReset = async () => {
@@ -18,7 +19,12 @@ const OlvidarContraseña: React.FC = () => {
 
       if (response.ok) {
         Alert.alert('Recuperación de contraseña', 'Te llegará un correo para restablecer tu contraseña.');
-        router.push('/Auth/Login'); // Redirigir al login después de enviar el correo
+
+        // Redirige a la pantalla de Restablecer Contraseña
+        router.push({
+          pathname: '/Auth/restablecerContrasena',
+          params: { email } // Puedes pasar el email o cualquier otro dato necesario
+        });
       } else {
         Alert.alert('Error', 'El correo no está registrado.');
       }
