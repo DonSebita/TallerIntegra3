@@ -8,7 +8,7 @@ const OlvidarContraseña: React.FC = () => {
 
   const handlePasswordReset = async () => {
     try {
-      const response = await fetch('http://localhost:3000/auth/forgot-password', {
+      const response = await fetch('http://localhost:3000/api/password/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
