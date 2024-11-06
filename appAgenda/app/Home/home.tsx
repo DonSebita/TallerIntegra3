@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, Text, ActivityIndicator, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Link, useRouter } from 'expo-router'; // Para redirigir si no está validado
+import axios from 'axios'; // Importa axios para hacer la solicitud de logout al backend
+import { Link, useRouter } from 'expo-router';
 
 const HomePage: React.FC = () => {
-  const [isValidated, setIsValidated] = useState<boolean | null>(null);  // Estado para verificar si el usuario está validado
-  const router = useRouter();  // Hook para redirigir
+  const [isValidated, setIsValidated] = useState<boolean | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const checkValidation = async () => {
       try {
-        const usuarioData = await AsyncStorage.getItem('usuario');  // Recupera el usuario desde AsyncStorage
+        const usuarioData = await AsyncStorage.getItem('usuario');
         if (usuarioData) {
           const usuario = JSON.parse(usuarioData);
           if (usuario.validado) {
-            setIsValidated(true);  // Si el usuario está validado
+            setIsValidated(true);
           } else {
-            setIsValidated(false);  // Si no está validado, redirige a la página de login
+            setIsValidated(false);
             router.push('/Auth/Login');
           }
         } else {
-          setIsValidated(false);  // Si no hay usuario en AsyncStorage, redirige a la página de login
+          setIsValidated(false);
           router.push('/Auth/Login');
         }
       } catch (error) {
@@ -30,23 +31,48 @@ const HomePage: React.FC = () => {
       }
     };
 
-    checkValidation();  // Llama a la función para validar al usuario cuando el componente cargue
+    checkValidation();
   }, [router]);
+
+  const handleLogout = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token'); // Obtiene el token almacenado
+
+      if (token) {
+        // Realiza una solicitud al backend para invalidar el token
+        await axios.post(
+          'http://localhost:3000/auth/logout', // Reemplaza con la URL correcta de tu backend
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+      }
+
+      // Elimina el token y otros datos del usuario en AsyncStorage
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('usuario');
+      
+      setIsValidated(false); // Cambia el estado de validación
+      router.push('/Auth/Login'); // Redirige al inicio de sesión
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   const windowWidth = Dimensions.get('window').width;
   const isMobile = windowWidth < 768;
 
-  // Si aún no se ha determinado si el usuario está validado, muestra un indicador de carga
   if (isValidated === null) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   return (
     <SafeAreaView style={isMobile ? styles.mobileContainer : styles.desktopContainer}>
-      {/* Logo */}
       <Image source={require('@/assets/images/logo-muni.png')} style={styles.logo} />
       
-      {/* Contenedor de botones */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.buttonAgendar, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
           <Link href="/Auth/agenda" style={styles.buttonText}>Agendar Hora</Link>
@@ -57,8 +83,15 @@ const HomePage: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.buttonEditar, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}>
-          Editar/Cancelar Citas
           <Link href="/Home/EditarCitas" style={styles.buttonText}>Editar/Cancelar Citas</Link>
+        </TouchableOpacity>
+
+        {/* Botón de Cerrar Sesión */}
+        <TouchableOpacity
+          style={[styles.button, styles.buttonLogout, { width: isMobile ? '90%' : '40%', padding: isMobile ? 20 : 25 }]}
+          onPress={handleLogout} // Asegúrate de que esté correctamente ligado al evento
+        >
+          <Text style={styles.buttonText}>Cerrar Sesión</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -117,6 +150,9 @@ const styles = StyleSheet.create({
   },
   buttonEditar: {
     backgroundColor: '#f44336',
+  },
+  buttonLogout: {
+    backgroundColor: '#FF6347', // Color de fondo para el botón de Cerrar Sesión
   },
 });
 
