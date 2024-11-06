@@ -1,0 +1,5 @@
+# Archivo .gitignore
+credentials.json
+node_modules/
+
+package-lock.json
