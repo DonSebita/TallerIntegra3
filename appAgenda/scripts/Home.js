@@ -17,11 +17,11 @@ const Home = () => {
       <Text style={styles.titulo}>Noticias</Text> {/* Título agregado aquí */}
       <View style={styles.cardContainer}>
         <Tarjeta2 style={styles.card} />
-        <Tarjeta style={styles.centerCard} />
+        <Tarjeta style={styles.card} />
         <Tarjeta3 style={styles.card} />
         <Tarjeta4 style={styles.card} />
       </View>
-      <Footer/>
+      <Footer />
     </View>
   );
 };
@@ -36,26 +36,24 @@ const styles = StyleSheet.create({
   busquedaContainer: {
     marginTop: 20,
     width: '60%',
+    height: '60%',
   },
   titulo: {
-    fontSize: 35, // Tamaño del texto del título
+    fontSize: 50, // Tamaño del texto del título
     fontWeight: 'bold', // Negrita
-    marginVertical: 20, // Espacio vertical alrededor del título
+    marginVertical: 30, // Aumenta el margen vertical para moverlo hacia abajo
   },
   cardContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',  // Cambiado para alinear las tarjetas sin espacio entre ellas
     width: '100%',
-    paddingHorizontal: 40,
-    marginTop: 40,
+    paddingHorizontal: 0,  // Eliminado el padding horizontal para evitar espacios
+    marginTop: 10, // Ajusta el margen superior de las tarjetas para controlarlas mejor
   },
   card: {
-    width: '100%',
-    height: '100%',
-  },
-  centerCard: {
-    width: '60%',
-    marginHorizontal: 10,
+    width: 120,  // Tamaño fijo para cada tarjeta, ajusta según el diseño
+    height: 180, // Ajusta la altura si es necesario
+    marginRight: 10,  // Espacio entre las tarjetas (modificado)
   },
 });
 

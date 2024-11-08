@@ -7,6 +7,8 @@ import Footer from '@/scripts/Footer';
 import RegisterScreen from './Auth/register';  // Asegúrate de la ruta correcta
 import LoginScreen from './Auth/Login';        // Asegúrate de la ruta correcta
 
+
+
 type RootStackParamList = {
   Home: undefined;
   Register: undefined;
@@ -58,17 +60,17 @@ const AppStack = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F5F5DC',
   },
   buttonsContainer: {
     position: 'absolute',
-    top: 5,   // Ubica los botones en la parte superior
+    top: 10,   // Ubica los botones en la parte superior
     right: 100, // Ubica los botones a la derecha
     flexDirection: 'row',
   },
   buttonWrapper: {
     marginLeft: 10,  // Espacio entre los botones
-    width: 100,       // Ancho de cada botón
+    width: 200,       // Ancho de cada botón
 
   },
 });
