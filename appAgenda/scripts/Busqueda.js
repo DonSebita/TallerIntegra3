@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { Searchbar } from 'react-native-paper';
-import { FlatList, Text } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 
 const Busqueda = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
-  
+
   // Datos de ejemplo
   const datos = [
-    { id: '1', nombre: 'Manzana' },
-    { id: '2', nombre: 'Plátano' },
-    { id: '3', nombre: 'Pera' },
-    { id: '4', nombre: 'Uva' },
+    { id: '1', nombre: 'Maria' },
+    { id: '2', nombre: 'Pedro' },
+    { id: '3', nombre: 'Pablo' },
+    { id: '4', nombre: 'Jose' },
   ];
 
   // Filtrar los datos según la búsqueda
@@ -25,11 +25,16 @@ const Busqueda = () => {
         onChangeText={setSearchQuery}
         value={searchQuery}
       />
-      <FlatList
-        data={resultados}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => <Text>{item.nombre}</Text>}
-      />
+      {/* Solo renderiza la lista si hay algo en el campo de búsqueda */}
+      {searchQuery.length > 0 && (
+        <FlatList
+          data={resultados}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <Text>{item.nombre}</Text>
+          )}
+        />
+      )}
     </>
   );
 };
