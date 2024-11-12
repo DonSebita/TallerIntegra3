@@ -114,3 +114,21 @@ exports.validarCita = async (req, res) => {
         res.status(500).send('Error al validar la cita.');
     }
 };
+
+xports.obtenerCitasPorUsuario = async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const query = `
+        SELECT cita_id, servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, citas_canceladas, estado_cita, movilizacion_id 
+        FROM citas 
+        WHERE usuario_id = ? AND citas_canceladas = 0
+      `;
+      const [rows] = await db.promise().query(query, [userId]); // Usamos .promise() aquí
+  
+      res.status(200).json(rows);
+    } catch (error) {
+      console.error('Error al obtener las citas:', error);
+      res.status(500).json({ error: 'Error al obtener las citas del usuario.' });
+    }
+  };
