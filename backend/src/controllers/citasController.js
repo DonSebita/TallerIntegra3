@@ -88,3 +88,29 @@ exports.crearCita = async (req, res) => {
         res.status(500).send('Error al procesar la solicitud.');
     }
 };
+
+exports.validarCita = async (req, res) => {
+    const { cita_id } = req.body;
+
+    if (!cita_id) {
+        return res.status(400).send('No se encontro la cita o ya esta validada');
+    }
+
+    try {
+        const results = await query('SELECT * FROM citas WHERE cita_id = ?', [cita_id]);
+
+        if (results.length === 0) {
+            return res.status(401).send('Cita no encontrada');
+        }
+        
+        const update = `UPDATE citas SET estado_cita ='confirmada' WHERE cita_id = ?`;
+        
+        await query(update, [cita_id]);
+
+        res.status(201).send('Se confirmo la cita por parte del profesional.');
+        console.log('PUT - validarCita: Se actualizo la cita en la base de datos');
+    } catch (err) {
+        console.error('Error al actualizar la cita en la base de datos:', err);
+        res.status(500).send('Error al validar la cita.');
+    }
+};
