@@ -17,6 +17,9 @@ router.post('/register', authController.register); // Pasa la función específi
 // Ruta para login
 router.post('/login', authController.login); // Ahora la función login
 
+// Ruta para login de admins
+router.post('/login-admin', authController.loginAdmin);
+
 router.post('/logout', authController.logout);
 
 // Define la ruta absoluta al archivo credentials.json
