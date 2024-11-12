@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/crear-cita', crearCita);
 
 // Ruta para confirmar una cita
-router.post('/validar-cita', validarCita);
+router.put('/validar-cita/:cita_id', validarCita);
 
 // Ruta para obtener las citas de un usuario específico
 router.get('/:userId', obtenerCitasPorUsuario);

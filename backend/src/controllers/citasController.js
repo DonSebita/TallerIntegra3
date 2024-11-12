@@ -90,7 +90,7 @@ exports.crearCita = async (req, res) => {
 };
 
 exports.validarCita = async (req, res) => {
-    const { cita_id } = req.body;
+    const { cita_id } = req.params;
 
     if (!cita_id) {
         return res.status(400).send('No se encontro la cita o ya esta validada');
@@ -115,7 +115,7 @@ exports.validarCita = async (req, res) => {
     }
 };
 
-xports.obtenerCitasPorUsuario = async (req, res) => {
+exports.obtenerCitasPorUsuario = async (req, res) => {
     const { userId } = req.params;
   
     try {
