@@ -88,3 +88,47 @@ exports.crearCita = async (req, res) => {
         res.status(500).send('Error al procesar la solicitud.');
     }
 };
+
+exports.validarCita = async (req, res) => {
+    const { cita_id } = req.params;
+
+    if (!cita_id) {
+        return res.status(400).send('No se encontro la cita o ya esta validada');
+    }
+
+    try {
+        const results = await query('SELECT * FROM citas WHERE cita_id = ?', [cita_id]);
+
+        if (results.length === 0) {
+            return res.status(401).send('Cita no encontrada');
+        }
+        
+        const update = `UPDATE citas SET estado_cita ='confirmada' WHERE cita_id = ?`;
+        
+        await query(update, [cita_id]);
+
+        res.status(201).send('Se confirmo la cita por parte del profesional.');
+        console.log('PUT - validarCita: Se actualizo la cita en la base de datos');
+    } catch (err) {
+        console.error('Error al actualizar la cita en la base de datos:', err);
+        res.status(500).send('Error al validar la cita.');
+    }
+};
+
+exports.obtenerCitasPorUsuario = async (req, res) => {
+    const { userId } = req.params;
+  
+    try {
+      const query = `
+        SELECT cita_id, servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, citas_canceladas, estado_cita, movilizacion_id 
+        FROM citas 
+        WHERE usuario_id = ? AND citas_canceladas = 0
+      `;
+      const [rows] = await db.promise().query(query, [userId]); // Usamos .promise() aquí
+  
+      res.status(200).json(rows);
+    } catch (error) {
+      console.error('Error al obtener las citas:', error);
+      res.status(500).json({ error: 'Error al obtener las citas del usuario.' });
+    }
+  };

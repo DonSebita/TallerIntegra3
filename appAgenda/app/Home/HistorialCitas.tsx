@@ -1,47 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-// Definición de la interfaz para las citas
 interface Cita {
   cita_id: number;
+  servicio_id: number;
   profesional_id: number;
   agenda_id: number;
   fecha_cita: string;
+  citas_canceladas: boolean;
+  estado_cita: string;
   movilizacion_id: number;
 }
 
 const HistorialCitas = () => {
-  const [token, setToken] = useState<string | null>(null);
   const [citas, setCitas] = useState<Cita[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Función para obtener el token almacenado
-  const obtenerToken = async () => {
+  // Función para decodificar el token JWT y obtener el userId
+  const obtenerUserIdDesdeToken = async (): Promise<string | null> => {
     try {
-      const tokenAlmacenado = await AsyncStorage.getItem('token');
-      if (tokenAlmacenado) {
-        setToken(tokenAlmacenado);
-        obtenerCitas(tokenAlmacenado); // Llama a obtenerCitas con el token
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const decodedPayload = JSON.parse(atob(base64));
+        return decodedPayload.userId;
       }
     } catch (error) {
-      console.error('Error al obtener el token:', error);
+      console.error('Error al decodificar el token:', error);
     }
+    return null;
   };
 
   // Función para obtener citas desde el backend
-  const obtenerCitas = async (token: string) => {
+  const obtenerCitas = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://tu-backend.com/api/citas', {
-        method: 'GET',
+      const userId = await obtenerUserIdDesdeToken();
+      const token = await AsyncStorage.getItem('token');
+
+      if (!userId || !token) {
+        console.error('No se pudo obtener el ID del usuario o el token.');
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:3000/api/citas/${userId}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      const data = await response.json();
-      setCitas(data);
+      setCitas(response.data);
     } catch (error) {
       console.error('Error al obtener las citas:', error);
     } finally {
@@ -49,29 +60,32 @@ const HistorialCitas = () => {
     }
   };
 
-  // Ejecutar obtenerToken cuando el componente se monte
   useEffect(() => {
-    obtenerToken();
+    obtenerCitas();
   }, []);
 
-  // Renderizar los títulos de las columnas de la tabla
-  const renderHeader = () => {
-    return (
-      <View style={styles.tableRow}>
-        <Text style={styles.tableHeader}>ID Cita</Text>
-        <Text style={styles.tableHeader}>ID Profesional</Text>
-        <Text style={styles.tableHeader}>Fecha Cita</Text>
-        <Text style={styles.tableHeader}>ID Movilización</Text>
-      </View>
-    );
-  };
+  const renderHeader = () => (
+    <View style={styles.tableRow}>
+      <Text style={styles.tableHeader}>ID Cita</Text>
+      <Text style={styles.tableHeader}>ID Servicio</Text>
+      <Text style={styles.tableHeader}>ID Profesional</Text>
+      <Text style={styles.tableHeader}>ID Agenda</Text>
+      <Text style={styles.tableHeader}>Fecha Cita</Text>
+      <Text style={styles.tableHeader}>Cancelada</Text>
+      <Text style={styles.tableHeader}>Estado</Text>
+      <Text style={styles.tableHeader}>ID Movilización</Text>
+    </View>
+  );
 
-  // Renderizar cada fila de la cita
   const renderItem = ({ item }: { item: Cita }) => (
     <View style={styles.tableRow}>
       <Text style={styles.tableCell}>{item.cita_id}</Text>
+      <Text style={styles.tableCell}>{item.servicio_id}</Text>
       <Text style={styles.tableCell}>{item.profesional_id}</Text>
+      <Text style={styles.tableCell}>{item.agenda_id}</Text>
       <Text style={styles.tableCell}>{item.fecha_cita}</Text>
+      <Text style={styles.tableCell}>{item.citas_canceladas ? 'Sí' : 'No'}</Text>
+      <Text style={styles.tableCell}>{item.estado_cita}</Text>
       <Text style={styles.tableCell}>{item.movilizacion_id}</Text>
     </View>
   );
@@ -79,13 +93,8 @@ const HistorialCitas = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Historial de Citas</Text>
-
-      {/* Contenedor de la tabla */}
       <View style={styles.tableContainer}>
-        {/* Mostrar el encabezado de la tabla */}
         {renderHeader()}
-
-        {/* Mostrar indicador de carga o lista de citas */}
         {loading ? (
           <View style={styles.loadingContainer}>
             <Text style={styles.loadingText}>Cargando citas...</Text>

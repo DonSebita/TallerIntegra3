@@ -99,6 +99,55 @@ exports.login = async (req, res) => {
     }
 };
 
+// Función para manejar el login para profesionales
+exports.loginAdmin = async (req, res) => {
+    const { rut, contraseña } = req.body;
+
+    if (!rut || !contraseña) {
+        return res.status(400).send('Faltan los campos requeridos');
+    }
+
+    try {
+        const results = await query(`SELECT * FROM usuarios WHERE rut = ? and rol = 'admin'`, [rut]);
+
+        if (results.length === 0) {
+            return res.status(401).send('Usuario no encontrado');
+        }
+
+        const user = results[0];
+        const match = await bcrypt.compare(contraseña, user.contrasena);
+
+        if (!match) {
+            return res.status(401).send({ success: false, message: 'Contraseña incorrecta' });
+        } else if (user.validado !== 1) {
+            return res.status(403).send({ success: false, message: 'Tu cuenta no ha sido validada. Contacta al administrador.' });
+        } else {
+            console.log('POST - login: El usuario inició sesión correctamente');
+
+            const payload = {
+                userId: user.usuario_id,
+                rut: user.rut,
+                rol: user.rol,
+                loginTime: Date.now()
+            };
+
+            const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+            console.log('JWT Token generado:', token);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Sesión iniciada correctamente',
+                token: token,
+                rol: user.rol,
+                validado: user.validado
+            });
+        }
+    } catch (err) {
+        console.error('Error en el proceso de login:', err);
+        return res.status(500).send('Error en el servidor');
+    }
+};
+
 // Función para cerrar sesión e invalidar el token
 exports.logout = (req, res) => {
     const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
