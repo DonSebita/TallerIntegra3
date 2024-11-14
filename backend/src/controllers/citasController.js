@@ -22,43 +22,56 @@ if (fs.existsSync(TOKEN_PATH)) {
 // Función para verificar y crear una cita
 exports.crearCita = async (req, res) => {
     const { servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, movilizacion_id } = req.body;
-
+    console.log("Datos recibidos para crear cita:", req.body);
+    
     if (!fecha_cita || !servicio_id || !profesional_id || !usuario_id) {
         return res.status(400).send('Faltan campos requeridos.');
     }
 
     try {
+        // Obtener día y hora desde fecha_cita
+        const fecha = fecha_cita.split("T")[0];  // Solo la fecha en formato YYYY-MM-DD
+        const hora = new Date(fecha_cita).toISOString().split("T")[1].substring(0, 5);  // Solo la hora en formato HH:MM
+
+        // Verificar disponibilidad en `agenda`
         const disponibilidadQuery = `
             SELECT * FROM agenda 
-            WHERE agenda_id = ? AND profesional_id = ? 
-            AND horas_agenda_disponibles IS NOT NULL
-            AND DATE(horas_agenda_disponibles) = DATE(?)`;
-
-        const agenda = await query(disponibilidadQuery, [agenda_id, profesional_id, fecha_cita]);
+            WHERE agenda_id = ? AND profesional_id = ? AND dia = ? AND hora_inicio = ? AND disponible = 1
+        `;
+        const agenda = await query(disponibilidadQuery, [agenda_id, profesional_id, fecha, hora]);
 
         if (agenda.length === 0) {
             return res.status(400).send('La fecha y hora solicitada no están disponibles.');
         }
 
-        const clienteEmail = "integra3.2024@gmail.com";
+        // Obtener el correo electrónico del cliente desde la tabla `usuarios`
+        const clienteQuery = `SELECT correo FROM usuarios WHERE usuario_id = ?`;
+        const cliente = await query(clienteQuery, [usuario_id]);
+        const clienteEmail = cliente[0]?.correo;
 
+        if (!clienteEmail) {
+            return res.status(400).send('No se pudo encontrar el correo del cliente.');
+        }
+
+        // Insertar la cita en `citas`
         const insertCitaQuery = `
             INSERT INTO citas 
                 (servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, citas_canceladas, estado_cita, movilizacion_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
         await query(insertCitaQuery, [
             servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, 0, 'sin confirmar', movilizacion_id
         ]);
 
+        // Actualizar la disponibilidad en `agenda`
         const updateAgendaQuery = `
             UPDATE agenda 
-            SET horas_agenda_disponibles = NULL,
-                horas_agenda_ocupadas = DATE(?) 
-            WHERE agenda_id = ?`;
+            SET disponible = 0 
+            WHERE agenda_id = ?
+        `;
+        await query(updateAgendaQuery, [agenda_id]);
 
-        await query(updateAgendaQuery, [fecha_cita, agenda_id]);
-
+        // Crear el evento en Google Calendar
         const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
         const event = {
             summary: `Cita para el servicio ${servicio_id}`,
@@ -71,9 +84,7 @@ exports.crearCita = async (req, res) => {
                 dateTime: new Date(new Date(fecha_cita).getTime() + 30 * 60 * 1000).toISOString(),
                 timeZone: 'America/Santiago',
             },
-            attendees: [
-                { email: clienteEmail }
-            ],
+            attendees: [{ email: clienteEmail }],
         };
 
         await calendar.events.insert({
@@ -81,13 +92,15 @@ exports.crearCita = async (req, res) => {
             resource: event,
         });
 
-        console.log('Cita y evento de Google Calendar creados exitosamente en el calendario de prueba');
-        res.status(201).send({ message: 'Cita ingresada y evento creado en Google Calendar de prueba' });
+        console.log('Cita y evento de Google Calendar creados exitosamente.');
+        res.status(201).send({ message: 'Cita ingresada y evento creado en Google Calendar.' });
     } catch (err) {
         console.error('Error al verificar o reservar la hora:', err);
         res.status(500).send('Error al procesar la solicitud.');
     }
 };
+
+
 
 exports.validarCita = async (req, res) => {
     const { cita_id } = req.params;

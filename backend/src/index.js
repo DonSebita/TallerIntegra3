@@ -5,6 +5,7 @@ const { router: authRoutes, ensureAuthenticated } = require('./routes/auth.js');
 const calendarRoutes = require('./services/calendar.js'); // Importa las rutas de Google Calendar
 const passwordRoutes = require('./routes/passwordRoutes.js'); // Importa las rutas de restablecimiento de contraseña
 const citasRoutes = require('./routes/citasRouter.js') // Importa las rutas de gestión de citas
+const agendaRoutes = require('./routes/agendaRoutes.js'); // Importa las rutas de agenda
 const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
@@ -36,6 +37,9 @@ app.use('/api/password', passwordRoutes);
 
 // Usa las rutas de gestion de citas
 app.use('/api/citas', citasRoutes)
+
+// Usa las rutas de agenda para manejar horarios disponibles
+app.use('/api/agenda', agendaRoutes);
 
 // Ruta base para verificar que el servidor está corriendo
 app.get('/', (req, res) => {
