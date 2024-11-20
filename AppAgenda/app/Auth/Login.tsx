@@ -81,7 +81,7 @@ const LoginForm: React.FC = () => {
         source={require('@/assets/images/logo-muni.png')}
         style={[
           styles.logo,
-          { width: isMobile ? '70%' : '50%', height: isMobile ? '20%' : 'auto' },
+          { width: isMobile ? '70%' : '35%', height: isMobile ? '20%' : 'auto' },
         ]}
       />
 
@@ -107,7 +107,7 @@ const LoginForm: React.FC = () => {
 
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-        <TouchableOpacity onPress={() => router.push('../Auth/OlvidarContrasena')}>
+        <TouchableOpacity onPress={() => router.push('/Auth/ForgotPassword')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             ¿Olvidaste tu contraseña?
           </Text>

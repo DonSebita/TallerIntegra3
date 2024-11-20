@@ -1,0 +1,338 @@
+import * as React from 'react';
+import { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Define el tipo de datos que manejará el formulario
+interface FormData {
+    rut: string;
+    primer_nombre: string;
+    segundo_nombre: string;
+    tercer_nombre: string;
+    apellido_paterno: string;
+    apellido_materno: string;
+    fecha_nacimiento: string;
+    ciudad: string;
+    comuna: string;
+    direccion: string;
+    telefono: string;
+    celular: string;
+    correo: string;
+    contrasena: string;  // Debe coincidir con el backend
+  }
+  
+  const RegistroForm: React.FC = () => {
+    const [formData, setFormData] = useState<FormData>({
+      rut: '',
+      primer_nombre: '',
+      segundo_nombre: '',
+      tercer_nombre: '',
+      apellido_paterno: '',
+      apellido_materno: '',
+      fecha_nacimiento: '',
+      ciudad: '',
+      comuna: '',
+      direccion: '',
+      telefono: '',
+      celular: '',
+      correo: '',
+      contrasena: '',  // Asegúrate de que el nombre coincida con el backend
+    });
+  
+    const [currentStep, setCurrentStep] = useState(0); // Controla qué campo se muestra actualmente
+
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(Dimensions.get('window').width);
+  const [windowHeight, setWindowHeight] = useState<number>(Dimensions.get('window').height);
+
+  const isMobile = windowWidth < 768;
+
+  const handleInputChange = (name: keyof FormData, value: string) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleNext = () => {
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmit(); // Enviar el formulario cuando se alcance el último paso
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
+        router.push('/Auth/Login');  
+      } else {
+        Alert.alert('Error', 'Hubo un problema al registrarse');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema en la conexión');
+    }
+  };
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      setWindowWidth(Dimensions.get('window').width);
+      setWindowHeight(Dimensions.get('window').height);
+    };
+
+    const subscription = Dimensions.addEventListener('change', updateDimensions);
+    return () => subscription.remove();
+  }, []);
+
+  return (
+    <View
+      style={[
+        styles.container,
+        isMobile ? styles.mobileContainer : styles.desktopContainer,
+        { justifyContent: isMobile ? 'flex-start' : 'space-between' },
+      ]}
+    >
+      <Image
+        source={require('@/assets/images/logo-muni.png')}
+        style={[
+          styles.logo,
+          { width: isMobile ? '70%' : '35%', height: isMobile ? '20%' : 'auto' },
+        ]}
+      />
+
+      <View style={[styles.form, isMobile ? { width: '100%' } : { width: '45%' }]}>
+        <Text style={[styles.titulo, { fontSize: isMobile ? 30 : 50 }]}>Cree su Cuenta</Text>
+        <Text style={[styles.subTitle, { fontSize: isMobile ? 20 : 30 }]}>Ingrese Sus Datos Para Crear Su Cuenta</Text>
+
+        <TextInput
+          placeholder="RUT"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 0 ? 'flex' : 'none' },
+          ]}
+          value={formData.rut as keyof FormData}
+          onChangeText={(value) => handleInputChange('rut' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Primer Nombre"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 1 ? 'flex' : 'none' },
+          ]}
+          value={formData.primer_nombre as keyof FormData}
+          onChangeText={(value) => handleInputChange('primer_nombre' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Segundo Nombre"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 1 ? 'flex' : 'none' },
+          ]}
+          value={formData.segundo_nombre as keyof FormData}
+          onChangeText={(value) => handleInputChange('segundo_nombre' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Tercer Nombre (No Obligatorio)"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 1 ? 'flex' : 'none' },
+          ]}
+          value={formData.tercer_nombre as keyof FormData}
+          onChangeText={(value) => handleInputChange('tercer_nombre' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Apellido Paterno"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 2 ? 'flex' : 'none' },
+          ]}
+          value={formData.apellido_paterno as keyof FormData}
+          onChangeText={(value) => handleInputChange('apellido_paterno' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Apellido Materno"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 2 ? 'flex' : 'none' },
+          ]}
+          value={formData.apellido_materno as keyof FormData}
+          onChangeText={(value) => handleInputChange('apellido_materno' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Fecha de Nacimiento"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 2 ? 'flex' : 'none' },
+          ]}
+          value={formData.fecha_nacimiento as keyof FormData}
+          onChangeText={(value) => handleInputChange('fecha_nacimiento' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Ciudad"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 3 ? 'flex' : 'none' },
+          ]}
+          value={formData.ciudad as keyof FormData}
+          onChangeText={(value) => handleInputChange('ciudad' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Comuna"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 3 ? 'flex' : 'none' },
+          ]}
+          value={formData.comuna as keyof FormData}
+          onChangeText={(value) => handleInputChange('comuna' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Dirección"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 3 ? 'flex' : 'none' },
+          ]}
+          value={formData.direccion as keyof FormData}
+          onChangeText={(value) => handleInputChange('direccion' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Teléfono Fijo"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 4 ? 'flex' : 'none' },
+          ]}
+          value={formData.telefono as keyof FormData}
+          onChangeText={(value) => handleInputChange('telefono' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Celular"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 4 ? 'flex' : 'none' },
+          ]}
+          value={formData.celular as keyof FormData}
+          onChangeText={(value) => handleInputChange('celular' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Correo Electronico"
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 4 ? 'flex' : 'none' },
+          ]}
+          value={formData.correo as keyof FormData}
+          onChangeText={(value) => handleInputChange('correo' as keyof FormData, value)}
+        />
+        <TextInput
+          placeholder="Contraseña"
+          secureTextEntry={true}
+          style={[
+            styles.textInput,
+            { fontSize: isMobile ? 16 : 20 },
+            { display: currentStep === 4 ? 'flex' : 'none' },
+          ]}
+          value={formData.contrasena as keyof FormData}
+          onChangeText={(value) => handleInputChange('contrasena' as keyof FormData, value)}
+        />
+
+        <View style={[{ display: currentStep > 0 ? 'flex' : 'none' }]}>
+          <Button title='Volver' color="#00ae41" onPress={handleBack} />
+        </View>
+        
+        <Button title={currentStep < 4 ? 'Siguiente' : 'Registrar'} color="#00ae41" onPress={handleNext} />
+
+        {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+
+        Ya tiene una cuenta...
+        <TouchableOpacity onPress={() => router.push('../Auth/Login')}>
+          <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
+            Pulse aquí.
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <StatusBar style="auto" />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  desktopContainer: {
+    flexDirection: 'row',
+    padding: '10%',
+  },
+  mobileContainer: {
+    alignItems: 'center',
+  },
+  logo: {
+    resizeMode: 'contain',
+  },
+  form: {
+    alignItems: 'center',
+  },
+  titulo: {
+    marginTop: 20,
+    fontWeight: 'bold',
+    color: '#34434D',
+  },
+  subTitle: {
+    color: 'gray',
+    marginBottom: '2%',
+  },
+  textInput: {
+    padding: 10,
+    paddingStart: 30,
+    width: '100%',
+    height: 50,
+    marginTop: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    marginBottom: '5%',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  forgotPassword: {
+    color: '#007AFF',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+});
+
+export default RegistroForm;
