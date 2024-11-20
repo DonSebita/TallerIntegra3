@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
+import BotonAdd from '@/components/botones/BotonAñadirUsuarios';
+import AddModal from '@/components/modal/AddModal';
 
 interface User {
   id: string;
@@ -16,6 +18,8 @@ const UserList = () => {
   const [searchText, setSearchText] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const router = useRouter();
+  const [mostrarModal, setMostrarModal] = useState <boolean> (false);
+
 
   useEffect(() => {
     // Simulación de obtención de datos de usuarios
@@ -54,9 +58,13 @@ const UserList = () => {
     router.push(`/home/usuarios/${id}`);
   };
 
+  const handleMostrarModal= () =>{
+    setMostrarModal(true);
+  }
   return (
     <View style={styles.box}>
       <Text>Usuarios</Text>
+      <BotonAdd text='Añadir' onPress={handleMostrarModal}/>
       <View style={styles.container}>
         <TextInput
           style={styles.searchInput}
@@ -81,6 +89,16 @@ const UserList = () => {
           />
         </ScrollView>
       </View>
+      <Modal
+        visible={mostrarModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setMostrarModal(false)}
+      >
+        <AddModal
+          onSave={() => setMostrarModal(false)}
+          onCancel={() => setMostrarModal(false)}/>
+      </Modal>
     </View>
   );
 };
