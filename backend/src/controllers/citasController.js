@@ -100,7 +100,29 @@ exports.crearCita = async (req, res) => {
     }
 };
 
+exports.crearHorarioDisponible = async (req, res) => {
+    const { profesional_id, dia, hora_inicio, hora_fin } = req.body;
 
+    // Validar campos requeridos
+    if (!profesional_id || !dia || !hora_inicio || !hora_fin) {
+        return res.status(400).send('Faltan campos requeridos.');
+    }
+
+    try {
+        // Insertar el horario en la tabla 'agenda'
+        const queryInsert = `
+            INSERT INTO agenda (profesional_id, dia, hora_inicio, hora_fin, disponible) 
+            VALUES (?, ?, ?, ?, 1)
+        `;
+
+        await query(queryInsert, [profesional_id, dia, hora_inicio, hora_fin]);
+
+        res.status(201).send('Horario disponible creado exitosamente.');
+    } catch (error) {
+        console.error('Error al crear horario disponible:', error);
+        res.status(500).send('Error al crear el horario.');
+    }
+};
 
 exports.validarCita = async (req, res) => {
     const { cita_id } = req.params;
