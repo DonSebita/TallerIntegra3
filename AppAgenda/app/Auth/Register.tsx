@@ -71,6 +71,29 @@ interface FormData {
   };
 
   const handleSubmit = async () => {
+    // Validar que todos los campos requeridos estén completos
+    const requiredFields = [
+      'rut',
+      'primer_nombre',
+      'apellido_paterno',
+      'apellido_materno',
+      'fecha_nacimiento',
+      'ciudad',
+      'comuna',
+      'direccion',
+      'celular',
+      'correo',
+      'contrasena',
+    ];
+  
+    for (const field of requiredFields) {
+      if (!formData[field as keyof FormData]) {
+        Alert.alert('Error', `El campo ${field.replace('_', ' ')} es obligatorio.`);
+        return;
+      }
+    }
+  
+    // Intentar enviar los datos al backend
     try {
       const response = await fetch('http://localhost:3000/auth/register', {
         method: 'POST',
@@ -79,18 +102,24 @@ interface FormData {
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
+        const data = await response.json();
         Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
-        router.push('/Auth/Login');  
+        router.push('/Auth/Login'); // Redirigir al login
       } else {
-        Alert.alert('Error', 'Hubo un problema al registrarse');
+        const errorData = await response.json();
+        // Manejar errores específicos devueltos por el servidor
+        const message =
+          errorData?.message || 'Hubo un problema al registrarse. Intenta nuevamente.';
+        Alert.alert('Error', message);
       }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Hubo un problema en la conexión');
+      console.error('Error en la conexión:', error);
+      Alert.alert('Error', 'Hubo un problema en la conexión. Intenta nuevamente.');
     }
   };
+  
 
   useEffect(() => {
     const updateDimensions = () => {

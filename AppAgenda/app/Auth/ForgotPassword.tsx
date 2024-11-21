@@ -29,25 +29,47 @@ const forgotPasswordForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    // Validar que el correo no esté vacío y tenga un formato válido
+    if (!formData.correo) {
+      setErrorMessage('El campo de correo electrónico es obligatorio.');
+      return;
+    }
+  
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.correo)) {
+      setErrorMessage('Por favor, ingrese un correo electrónico válido.');
+      return;
+    }
+  
+    // Intentar enviar la solicitud al backend
     try {
-      const response = await fetch('http://localhost:3000/auth/forgot-password', {
+      const response = await fetch('http://localhost:3000/api/password/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
-
+  
       if (response.ok) {
-        router.push('/Auth/ResetPassword');
+        Alert.alert(
+          'Solicitud enviada',
+          'Se ha enviado un correo con las instrucciones para restablecer la contraseña.',
+          [{ text: 'Aceptar', onPress: () => router.push('/Auth/ResetPassword') }]
+        );
       } else {
-        setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
+        const errorData = await response.json();
+        const message =
+          errorData?.message ||
+          'Hubo un problema con la solicitud. Verifica tu correo o contacta al administrador.';
+        setErrorMessage(message);
       }
     } catch (error) {
-      console.error(error);
-      setErrorMessage('Hubo un problema con la solicitud. Intenta nuevamente.');
+      console.error('Error en la solicitud:', error);
+      setErrorMessage('Hubo un problema con la conexión. Intenta nuevamente.');
     }
   };
+  
 
   useEffect(() => {
     const updateDimensions = () => {

@@ -31,33 +31,54 @@ const LoginForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    // Validación inicial del formulario
+    if (!formData.rut || !formData.contraseña) {
+      setErrorMessage('Por favor, completa todos los campos.');
+      return;
+    }
+  
     try {
+      // Realizar la solicitud al servidor
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          rut: formData.rut,
+          contraseña: formData.contraseña,
+        }),
       });
-
+  
+      // Si la solicitud es exitosa
       if (response.ok) {
         const userData = await response.json();
-
+  
+        // Almacenar el token en AsyncStorage si está presente
         if (userData.token) {
           await AsyncStorage.setItem('token', userData.token);
+          Alert.alert('Éxito', 'Inicio de sesión exitoso.');
+          router.push('/Home/home'); // Redirigir a la página de inicio
+        } else {
+          setErrorMessage('No se recibió un token válido del servidor.');
         }
-
-        router.push('/Home/home');
       } else if (response.status === 403) {
+        // Caso específico: cuenta no validada
         setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
       } else {
-        setErrorMessage('Hubo un problema al iniciar sesión. Verifica tus credenciales.');
+        // Otros errores: mostrar mensaje específico del servidor si está disponible
+        const errorData = await response.json();
+        setErrorMessage(
+          errorData.message || 'Hubo un problema al iniciar sesión. Verifica tus credenciales.'
+        );
       }
     } catch (error) {
-      console.error(error);
-      setErrorMessage('Hubo un problema con la solicitud. Intenta nuevamente.');
+      // Manejo de errores de red o problemas en la solicitud
+      console.error('Error:', error);
+      setErrorMessage('Hubo un problema con la solicitud. Por favor, intenta nuevamente.');
     }
   };
+  
 
   useEffect(() => {
     const updateDimensions = () => {

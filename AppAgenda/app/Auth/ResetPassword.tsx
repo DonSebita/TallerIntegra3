@@ -31,22 +31,34 @@ const resetPasswordForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    if (!formData.token || !formData.contraseña) {
+      setErrorMessage('Por favor, completa todos los campos.');
+      return;
+    }
+  
     try {
-      const response = await fetch(`http://localhost:3000/auth/reset-password/${formData.token}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData.contraseña),
-      });
-
+      const response = await fetch(
+        `http://localhost:3000/api/password/reset-password/${formData.token}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ contraseña: formData.contraseña }),
+        }
+      );
+  
       if (response.ok) {
+        Alert.alert('Éxito', 'Contraseña actualizada correctamente');
         router.push('/Auth/Login');
       } else {
-        setErrorMessage('Hubo un problema al iniciar sesión. Verifica tus credenciales.');
+        const errorData = await response.json();
+        setErrorMessage(
+          errorData.message || 'Hubo un problema al actualizar la contraseña.'
+        );
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error:', error);
       setErrorMessage('Hubo un problema con la solicitud. Intenta nuevamente.');
     }
   };
