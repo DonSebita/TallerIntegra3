@@ -167,3 +167,32 @@ exports.obtenerCitasPorUsuario = async (req, res) => {
       res.status(500).json({ error: 'Error al obtener las citas del usuario.' });
     }
   };
+  exports.verCitasProfesional = async (req, res) => {
+    const { profesionalId } = req.params;
+    if (!profesionalId) {
+        return res.status(400).send('El ID del profesional es requerido.');
+    }
+
+    try {
+        const obtenerCitasQuery = `
+            SELECT 
+                cita_id,
+                servicio_id,
+                usuario_id,
+                fecha_cita,
+                estado_cita
+            FROM citas
+            WHERE profesional_id = ?
+        `;
+        const citas = await query(obtenerCitasQuery, [profesionalId]);
+
+        if (citas.length === 0) {
+            return res.status(404).send('No hay citas agendadas para este profesional.');
+        }
+
+        res.status(200).json(citas);
+    } catch (error) {
+        console.error('Error al obtener citas del profesional:', error);
+        res.status(500).send('Error al obtener las citas del profesional.');
+    }
+};
