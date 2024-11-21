@@ -21,84 +21,64 @@ if (fs.existsSync(TOKEN_PATH)) {
 
 // Función para verificar y crear una cita
 exports.crearCita = async (req, res) => {
-    const { servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, movilizacion_id } = req.body;
+    const { servicio_id, profesional_id, agenda_id, usuario_id, movilizacion_id } = req.body;
+
     console.log("Datos recibidos para crear cita:", req.body);
-    
-    if (!fecha_cita || !servicio_id || !profesional_id || !usuario_id) {
+
+    if (!agenda_id || !servicio_id || !profesional_id || !usuario_id || !movilizacion_id) {
         return res.status(400).send('Faltan campos requeridos.');
     }
 
     try {
-        // Obtener día y hora desde fecha_cita
-        const fecha = fecha_cita.split("T")[0];  // Solo la fecha en formato YYYY-MM-DD
-        const hora = new Date(fecha_cita).toISOString().split("T")[1].substring(0, 5);  // Solo la hora en formato HH:MM
-
-        // Verificar disponibilidad en `agenda`
-        const disponibilidadQuery = `
+        const verificarDisponibilidadQuery = `
             SELECT * FROM agenda 
-            WHERE agenda_id = ? AND profesional_id = ? AND dia = ? AND hora_inicio = ? AND disponible = 1
+            WHERE agenda_id = ? AND profesional_id = ? AND disponible = 1
         `;
-        const agenda = await query(disponibilidadQuery, [agenda_id, profesional_id, fecha, hora]);
+        const horario = await query(verificarDisponibilidadQuery, [agenda_id, profesional_id]);
 
-        if (agenda.length === 0) {
-            return res.status(400).send('La fecha y hora solicitada no están disponibles.');
+        if (horario.length === 0) {
+            return res.status(400).send('El horario seleccionado no está disponible o no existe.');
         }
 
-        // Obtener el correo electrónico del cliente desde la tabla `usuarios`
-        const clienteQuery = `SELECT correo FROM usuarios WHERE usuario_id = ?`;
-        const cliente = await query(clienteQuery, [usuario_id]);
-        const clienteEmail = cliente[0]?.correo;
+        const horarioSeleccionado = horario[0];
+        const fecha = new Date(horarioSeleccionado.dia); // Convierte el día a formato Date
+        const hora = horarioSeleccionado.hora_inicio; // Usa la hora de inicio
 
-        if (!clienteEmail) {
-            return res.status(400).send('No se pudo encontrar el correo del cliente.');
-        }
+        // Combina fecha y hora en el formato correcto
+        const fechaCita = `${fecha.toISOString().split('T')[0]} ${hora}`;
 
-        // Insertar la cita en `citas`
-        const insertCitaQuery = `
+        const insertarCitaQuery = `
             INSERT INTO citas 
                 (servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, citas_canceladas, estado_cita, movilizacion_id) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        await query(insertCitaQuery, [
-            servicio_id, profesional_id, agenda_id, usuario_id, fecha_cita, 0, 'sin confirmar', movilizacion_id
+
+        await query(insertarCitaQuery, [
+            servicio_id,
+            profesional_id,
+            agenda_id,
+            usuario_id,
+            fechaCita,
+            0,
+            'sin confirmar',
+            movilizacion_id,
         ]);
 
-        // Actualizar la disponibilidad en `agenda`
-        const updateAgendaQuery = `
+        const actualizarAgendaQuery = `
             UPDATE agenda 
             SET disponible = 0 
             WHERE agenda_id = ?
         `;
-        await query(updateAgendaQuery, [agenda_id]);
+        await query(actualizarAgendaQuery, [agenda_id]);
 
-        // Crear el evento en Google Calendar
-        const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
-        const event = {
-            summary: `Cita para el servicio ${servicio_id}`,
-            description: `Servicio ID: ${servicio_id}, Profesional ID: ${profesional_id}, Usuario ID: ${usuario_id}`,
-            start: {
-                dateTime: new Date(fecha_cita).toISOString(),
-                timeZone: 'America/Santiago',
-            },
-            end: {
-                dateTime: new Date(new Date(fecha_cita).getTime() + 30 * 60 * 1000).toISOString(),
-                timeZone: 'America/Santiago',
-            },
-            attendees: [{ email: clienteEmail }],
-        };
-
-        await calendar.events.insert({
-            calendarId: 'primary',
-            resource: event,
-        });
-
-        console.log('Cita y evento de Google Calendar creados exitosamente.');
-        res.status(201).send({ message: 'Cita ingresada y evento creado en Google Calendar.' });
-    } catch (err) {
-        console.error('Error al verificar o reservar la hora:', err);
-        res.status(500).send('Error al procesar la solicitud.');
+        console.log('Cita creada exitosamente.');
+        res.status(201).send('Cita creada exitosamente.');
+    } catch (error) {
+        console.error('Error al crear la cita o evento de Google Calendar:', error);
+        res.status(500).send('Error al procesar la creación de la cita.');
     }
 };
+
 
 exports.crearHorarioDisponible = async (req, res) => {
     const { profesional_id, dia, hora_inicio, hora_fin } = req.body;
@@ -123,6 +103,7 @@ exports.crearHorarioDisponible = async (req, res) => {
         res.status(500).send('Error al crear el horario.');
     }
 };
+
 
 exports.validarCita = async (req, res) => {
     const { cita_id } = req.params;
@@ -167,6 +148,7 @@ exports.obtenerCitasPorUsuario = async (req, res) => {
       res.status(500).json({ error: 'Error al obtener las citas del usuario.' });
     }
   };
+
   exports.verCitasProfesional = async (req, res) => {
     const { profesionalId } = req.params;
     if (!profesionalId) {
@@ -194,5 +176,31 @@ exports.obtenerCitasPorUsuario = async (req, res) => {
     } catch (error) {
         console.error('Error al obtener citas del profesional:', error);
         res.status(500).send('Error al obtener las citas del profesional.');
+    }
+};
+
+exports.obtenerHorariosDisponiblesGlobales = async (req, res) => {
+    try {
+        const obtenerHorariosQuery = `
+            SELECT 
+                agenda_id,
+                profesional_id,
+                dia,
+                hora_inicio,
+                hora_fin,
+                disponible 
+            FROM agenda
+            WHERE disponible = 1
+        `;
+        const horarios = await query(obtenerHorariosQuery);
+
+        if (horarios.length === 0) {
+            return res.status(404).send('No hay horarios disponibles.');
+        }
+
+        res.status(200).json(horarios);
+    } catch (error) {
+        console.error('Error al obtener horarios disponibles globales:', error);
+        res.status(500).send('Error al obtener los horarios disponibles.');
     }
 };
