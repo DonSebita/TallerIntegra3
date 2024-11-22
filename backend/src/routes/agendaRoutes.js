@@ -10,17 +10,12 @@ router.get('/horas-disponibles/:profesional_id', async (req, res) => {
 
     try {
         const horariosDisponibles = await query(`
-            SELECT agenda_id, 
-                   dia, 
-                   hora_inicio, 
-                   hora_fin,
-                   CONCAT(dia, 'T', hora_inicio) AS fecha_hora_disponible 
+            SELECT agenda_id, dia, hora_inicio, hora_fin 
             FROM agenda 
             WHERE profesional_id = ? AND disponible = 1
             ORDER BY dia, hora_inicio
         `, [profesional_id]);
 
-        // Aquí `fecha_hora_disponible` será una combinación de `dia` y `hora_inicio`
         res.json(horariosDisponibles);
     } catch (error) {
         console.error('Error al obtener horarios disponibles:', error);
