@@ -32,9 +32,9 @@ exports.getUsuarioDetalles = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Consultar detalles del usuario
+        // Consultar detalles del usuario con la información adicional
         const usuarioQuery = `
-            SELECT usuario_id, primer_nombre, segundo_nombre, apellido_paterno, correo, rol, validado 
+            SELECT usuario_id, primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, telefono, celular, correo, rol, validado 
             FROM usuarios
             WHERE usuario_id = ?
         `;
@@ -55,13 +55,19 @@ exports.getUsuarioDetalles = async (req, res) => {
         `;
         const citas = await query(citasQuery, [id]);
 
-        // Formatear la respuesta
+        // Formatear la respuesta con la información adicional
         const usuarioDetalles = {
             id: usuario.usuario_id,
-            name: `${usuario.primer_nombre} ${usuario.segundo_nombre || ''} ${usuario.apellido_paterno}`.trim(),
+            name: `${usuario.primer_nombre} ${usuario.segundo_nombre || ''} ${usuario.apellido_paterno} ${usuario.apellido_materno || ''}`.trim(),
             email: usuario.correo,
             role: usuario.rol,
             status: usuario.validado ? 'Verificado' : 'Sin Verificar',
+            fecha_nacimiento: usuario.fecha_nacimiento ? new Date(usuario.fecha_nacimiento).toLocaleDateString() : null,
+            ciudad: usuario.ciudad,
+            comuna: usuario.comuna,
+            direccion: usuario.direccion,
+            telefono: usuario.telefono,
+            celular: usuario.celular,
             appointments: citas.map(cita => ({
                 date: new Date(cita.fecha_cita).toLocaleDateString(),
                 service: cita.nombre_servicio,

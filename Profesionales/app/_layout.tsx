@@ -34,8 +34,8 @@ import { useEffect } from 'react';
 export default function RootLayout() {
   return (
     <Stack>
-      <Stack.Screen name='auth/login'/>
-      <Stack.Screen name='home'/>
+      <Stack.Screen name='auth/login' options={{headerShown:false,}}/>
+      <Stack.Screen name='home' options={{headerShown:false,}}/>
     </Stack>
   );
 }

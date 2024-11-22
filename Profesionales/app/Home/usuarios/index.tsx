@@ -49,7 +49,6 @@ const UserList = () => {
   }, [searchText, users]);
 
   const handleUserPress = (id: string) => {
-    // Navegar a la pantalla de detalles del usuario
     router.push(`/home/usuarios/${id}`);
   };
 
@@ -108,17 +107,13 @@ const UserList = () => {
 const styles = StyleSheet.create({
   box: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f9f9f9',
   },
   header: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
   botonContainer: {
-    alignItems: 'center', // Centra el botón horizontalmente
-    marginBottom: 20, // Espacio debajo del botón
+    alignSelf:'flex-end',
   },
   container: {
     flex: 1,
@@ -150,16 +145,19 @@ const styles = StyleSheet.create({
     width: '24%', // Ajusta el ancho para que haya 4 por fila
     aspectRatio: 1, // Relación de aspecto cuadrada
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 15, // Esquinas más redondeadas
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 10, // Mayor separación entre los cuadrados
+    marginHorizontal:5,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1, // Reduce la opacidad de la sombra
+    shadowRadius: 8, // Difumina más la sombra
+    elevation: 5, // Efecto de sombra para Android
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.1)', // Borde difuminado
   },
   userName: {
     fontSize: 16,

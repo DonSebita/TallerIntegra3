@@ -11,30 +11,33 @@ const BotonAdd = ({ onPress, text }: any) => {
             onPressOut={() => setIsPressed(false)} // Restaura el estado al soltar
             style={({ pressed }) => [
                 styles.container,
-                isPressed && styles.pressed // Aplica el estilo si está presionado
+                isPressed && styles.pressed, // Aplica el estilo si está presionado
+                { alignSelf: 'flex-end' } // Alinea el botón hacia la derecha
             ]}
         >
-            <Text style={styles.Text}>{text}</Text>
+            <Text style={styles.text}>{text}</Text>
         </Pressable>
     );
-}
+};
 
 const styles = StyleSheet.create({
     container: { 
         backgroundColor: '#F0421D',
-        width: '20%',
-        padding: 15,
-        marginVertical: 5,
+        paddingVertical: 12, // Espacio arriba y abajo
+        paddingHorizontal: 20, // Espacio a los lados
+        marginVertical: 10,
+        borderRadius: 25, // Bordes redondeados
+        minWidth: 150, // Asegura un ancho mínimo para el botón
         alignItems: "center",
-        borderRadius: 20,
     },
-    Text: {
+    text: {
         fontWeight: 'bold',
+        fontSize: 16, // Tamaño del texto
         color: 'black',
     },
     pressed: { // Estilo para cuando el botón está presionado
-        backgroundColor: '#C0371A', // Color más oscuro
-    }
+        backgroundColor: '#C0371A',
+    },
 });
 
 export default BotonAdd;
