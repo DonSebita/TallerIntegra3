@@ -96,7 +96,7 @@ const UserList = () => {
         onRequestClose={() => setMostrarModal(false)}
       >
         <AddModal
-          onSave={() => setMostrarModal(false)}
+          onSave={() => setMostrarModal(false)} 
           onCancel={() => setMostrarModal(false)}/>
       </Modal>
     </View>

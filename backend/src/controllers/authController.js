@@ -17,15 +17,13 @@ const blacklist = new Set();
 
 // Función para registrar un nuevo usuario
 exports.register = async (req, res) => {
-    const { rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, telefono, celular, correo, contrasena } = req.body;
+    const { rut, primer_nombre, segundo_nombre, tercer_nombre, apellido_paterno, apellido_materno, fecha_nacimiento, ciudad, comuna, direccion, telefono, celular, correo, contrasena,rol,validado } = req.body;
 
     if (!rut || !primer_nombre || !apellido_paterno || !correo || !contrasena) {
         return res.status(400).send('Faltan campos requeridos.');
     }
 
     const hashedPassword = await bcrypt.hash(contrasena, 10);
-    const rol = 'usuario';
-    const validado = 1;
 
     const insertUserQuery = `
       INSERT INTO usuarios 
@@ -46,7 +44,7 @@ exports.register = async (req, res) => {
         console.log('POST - register: Se ingresó el usuario a la base de datos');
     } catch (err) {
         console.error('Error al insertar el usuario en la base de datos:', err);
-        res.status(500).send('Error al registrar el usuario.');
+        res.status(500).json({ error: 'Error al registrar el usuario.' });
     }
 };
 

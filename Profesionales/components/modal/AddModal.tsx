@@ -10,9 +10,11 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import { DatePickerInput } from 'react-native-paper-dates';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { Alert } from 'react-native';
+
 interface ModalRegistroUsuarioProps {
   onCancel: () => void;
-  onSave: (userData: any) => void;
+  onSave: () => void;
 }
 
 const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({ onCancel, onSave }) => {
@@ -67,13 +69,13 @@ const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({ onCancel, o
       });
 
       if (!response.ok) {
-        throw new Error('Error al registrar el usuario');
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.error); 
+      } else {
+          Alert.alert('Éxito', 'Usuario registrado exitosamente');
+          onSave();
       }
 
-      const data = await response.json();
-      console.log('Usuario registrado:', data);
-
-      onSave(data); // Notifica al componente padre si es necesario
     } catch (error) {
       console.error('Error:', error);
     }
