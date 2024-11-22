@@ -45,7 +45,7 @@ exports.crearCita = async (req, res) => {
         const hora = horarioSeleccionado.hora_inicio; // Usa la hora de inicio
 
         // Combina fecha y hora en el formato correcto
-        const fechaCita = `${fecha.toISOString().split('T')[0]} ${hora}`;
+        const fechaCita = `${fecha.toISOString().split('T')[0]}T${hora}`;
 
         const insertarCitaQuery = `
             INSERT INTO citas 
@@ -71,8 +71,37 @@ exports.crearCita = async (req, res) => {
         `;
         await query(actualizarAgendaQuery, [agenda_id]);
 
-        console.log('Cita creada exitosamente.');
-        res.status(201).send('Cita creada exitosamente.');
+        // Crear evento en Google Calendar
+        const clienteQuery = `SELECT correo FROM usuarios WHERE usuario_id = ?`;
+        const cliente = await query(clienteQuery, [usuario_id]);
+        const clienteEmail = cliente[0]?.correo;
+
+        if (!clienteEmail) {
+            return res.status(400).send('No se pudo encontrar el correo del cliente.');
+        }
+
+        const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+        const event = {
+            summary: `Cita para el servicio ${servicio_id}`,
+            description: `Servicio ID: ${servicio_id}, Profesional ID: ${profesional_id}, Usuario ID: ${usuario_id}`,
+            start: {
+                dateTime: new Date(fechaCita).toISOString(),
+                timeZone: 'America/Santiago',
+            },
+            end: {
+                dateTime: new Date(new Date(fechaCita).getTime() + 30 * 60 * 1000).toISOString(),
+                timeZone: 'America/Santiago',
+            },
+            attendees: [{ email: clienteEmail }],
+        };
+
+        await calendar.events.insert({
+            calendarId: 'primary',
+            resource: event,
+        });
+
+        console.log('Cita y evento de Google Calendar creados exitosamente.');
+        res.status(201).send('Cita creada y evento de Google Calendar agregado exitosamente.');
     } catch (error) {
         console.error('Error al crear la cita o evento de Google Calendar:', error);
         res.status(500).send('Error al procesar la creación de la cita.');
