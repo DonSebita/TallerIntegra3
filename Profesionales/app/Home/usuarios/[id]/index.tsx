@@ -1,6 +1,5 @@
-// app/user/[id]/index.tsx
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter, useGlobalSearchParams } from 'expo-router';
 
 interface Appointment {
@@ -20,47 +19,52 @@ interface User {
 const UserDetail = () => {
   const { id } = useGlobalSearchParams();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulación de obtención de datos del usuario usando el ID
+    // Llamada al backend para obtener los datos del usuario usando el ID
     const fetchUserData = async () => {
-      // Aquí puedes hacer una llamada a la API para obtener los datos reales del usuario
-      const fetchedUser: User = {
-        id: id as string,
-        name: 'John Doe',
-        email: 'johndoe@gmail.com',
-        access: 'Owner',
-        joined: '-',
-        appointments: [
-          { date: 'Jan 15, 2024', service: 'Kinesiología' },
-          { date: 'Feb 5, 2024', service: 'Oftalmología' },
-        ],
-      };
-      setUser(fetchedUser);
+      try {
+        const response = await fetch(`http://localhost:3000/api/usuarios/${id}`);
+        const data: User = await response.json();
+        setUser(data);
+      } catch (error) {
+        console.error('Error al obtener los detalles del usuario:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchUserData();
   }, [id]);
 
+  if (loading) {
+    return <ActivityIndicator style={styles.loading} size="large" />;
+  }
+
   if (!user) {
-    return <Text>Loading...</Text>;
+    return <Text style={styles.error}>No se encontraron detalles del usuario.</Text>;
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User Details</Text>
-      <Text style={styles.info}>Name: {user.name}</Text>
-      <Text style={styles.info}>Email: {user.email}</Text>
-      <Text style={styles.info}>Access: {user.access}</Text>
-      <Text style={styles.info}>Joined: {user.joined}</Text>
-      
-      <Text style={styles.title}>Appointments</Text>
-      {user.appointments.map((appointment, index) => (
-        <View key={index} style={styles.appointment}>
-          <Text style={styles.info}>Date: {appointment.date}</Text>
-          <Text style={styles.info}>Service: {appointment.service}</Text>
-        </View>
-      ))}
+      <Text style={styles.title}>Detalles del Usuario</Text>
+      <Text style={styles.info}>Nombre: {user.name}</Text>
+      <Text style={styles.info}>Correo: {user.email}</Text>
+      <Text style={styles.info}>Acceso: {user.access}</Text>
+      <Text style={styles.info}>Fecha de Ingreso: {user.joined}</Text>
+
+      <Text style={styles.title}>Citas</Text>
+      {user.appointments.length > 0 ? (
+        user.appointments.map((appointment, index) => (
+          <View key={index} style={styles.appointment}>
+            <Text style={styles.info}>Fecha: {appointment.date}</Text>
+            <Text style={styles.info}>Servicio: {appointment.service}</Text>
+          </View>
+        ))
+      ) : (
+        <Text style={styles.info}>No hay citas registradas.</Text>
+      )}
     </View>
   );
 };
@@ -83,6 +87,17 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: '#f1f1f1',
     borderRadius: 4,
+  },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  error: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 

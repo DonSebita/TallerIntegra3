@@ -7,6 +7,7 @@ const passwordRoutes = require('./routes/passwordRoutes.js'); // Importa las rut
 const citasRoutes = require('./routes/citasRouter.js') // Importa las rutas de gestión de citas
 const agendaRoutes = require('./routes/agendaRoutes.js'); // Importa las rutas de agenda
 const authMiddleware = require('./middleware/authMiddleware');
+const usuariosRoutes = require('./routes/usuariosRoutes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -31,6 +32,9 @@ app.use('/auth', authRoutes);
 
 // Rutas protegidas para el calendario, que incluyen /create-event
 app.use('/api', calendarRoutes);
+
+//Ruta para Datos de Usuarios:
+app.use('/api/usuarios', usuariosRoutes);
 
 // Usa las rutas de restablecimiento de contraseña
 app.use('/api/password', passwordRoutes);

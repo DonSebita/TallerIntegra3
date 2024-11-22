@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ScrollView, Modal, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import BotonAdd from '@/components/botones/BotonAñadirUsuarios';
 import AddModal from '@/components/modal/AddModal';
@@ -8,36 +8,31 @@ interface User {
   id: string;
   name: string;
   email: string;
-  access: string;
+  role: string;
   status: string;
-  cita: string;
 }
 
 const UserList = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [searchText, setSearchText] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [searchText, setSearchText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [mostrarModal, setMostrarModal] = useState<boolean>(false);
   const router = useRouter();
-  const [mostrarModal, setMostrarModal] = useState <boolean> (false);
-
 
   useEffect(() => {
-    // Simulación de obtención de datos de usuarios
+    // Obtener usuarios desde el backend
     const fetchUsers = async () => {
-      const fetchedUsers: User[] = [
-        { id: '1', name: 'John Doe', email: 'johndoe@gmail.com', access: 'Owner', status: 'Verificado', cita: 'Kinesiologia' },
-        { id: '2', name: 'Steve Smith', email: 'stevesmith@gmail.com', access: 'Guest', status: 'Sin Verificar', cita: 'Fonoaudiologia' },
-        { id: '3', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-        { id: '4', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-        { id: '5', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-        { id: '6', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-        { id: '7', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Barberia' },
-        { id: '8', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-        { id: '9', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-        { id: '10', name: 'Wei Zhang', email: 'weizhang@gmail.com', access: 'Admin', status: 'Sin Verificar', cita: 'Peluqueria' },
-      ];
-      setUsers(fetchedUsers);
-      setFilteredUsers(fetchedUsers); // Inicialmente muestra todos los usuarios
+      try {
+        const response = await fetch('http://localhost:3000/api/usuarios'); // Cambia la URL según tu backend
+        const data: User[] = await response.json();
+        setUsers(data);
+        setFilteredUsers(data); // Inicialmente mostrar todos los usuarios
+      } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchUsers();
@@ -48,7 +43,7 @@ const UserList = () => {
     const results = users.filter(user =>
       user.name.toLowerCase().includes(searchText.toLowerCase()) ||
       user.email.toLowerCase().includes(searchText.toLowerCase()) ||
-      user.cita.toLowerCase().includes(searchText.toLowerCase())
+      user.role.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilteredUsers(results);
   }, [searchText, users]);
@@ -58,13 +53,20 @@ const UserList = () => {
     router.push(`/home/usuarios/${id}`);
   };
 
-  const handleMostrarModal= () =>{
+  const handleMostrarModal = () => {
     setMostrarModal(true);
+  };
+
+  if (loading) {
+    return <ActivityIndicator style={styles.loading} size="large" />;
   }
+
   return (
     <View style={styles.box}>
-      <Text>Usuarios</Text>
-      <BotonAdd text='Añadir' onPress={handleMostrarModal}/>
+      <Text style={styles.header}>Usuarios</Text>
+      <View style={styles.botonContainer}>
+        <BotonAdd text="Añadir" onPress={handleMostrarModal} />
+      </View>
       <View style={styles.container}>
         <TextInput
           style={styles.searchInput}
@@ -76,14 +78,13 @@ const UserList = () => {
           <FlatList
             data={filteredUsers}
             keyExtractor={(item) => item.id}
-            numColumns={4} // Esto coloca hasta 4 usuarios por fila
+            numColumns={4} // Hasta 4 usuarios por fila
             renderItem={({ item }) => (
               <TouchableOpacity style={styles.userItem} onPress={() => handleUserPress(item.id)}>
                 <Text style={styles.userName}>{item.name}</Text>
                 <Text style={styles.userEmail}>{item.email}</Text>
-                <Text style={styles.userAccess}>Acceso: {item.access}</Text>
-                <Text style={styles.userJoined}>Cita: {item.cita}</Text>
-                <Text style={styles.userStatus}>Status: {item.status}</Text>
+                <Text style={styles.userRole}>Rol: {item.role}</Text>
+                <Text style={styles.userStatus}>Estado: {item.status}</Text>
               </TouchableOpacity>
             )}
           />
@@ -96,8 +97,9 @@ const UserList = () => {
         onRequestClose={() => setMostrarModal(false)}
       >
         <AddModal
-          onSave={() => setMostrarModal(false)} 
-          onCancel={() => setMostrarModal(false)}/>
+          onSave={() => setMostrarModal(false)} // Lógica original
+          onCancel={() => setMostrarModal(false)} // Lógica original
+        />
       </Modal>
     </View>
   );
@@ -106,17 +108,24 @@ const UserList = () => {
 const styles = StyleSheet.create({
   box: {
     flex: 1,
-    justifyContent: 'center', // Centra el container verticalmente
-    alignItems: 'center', // Centra el container horizontalmente
-    padding: 10,
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  botonContainer: {
+    alignItems: 'center', // Centra el botón horizontalmente
+    marginBottom: 20, // Espacio debajo del botón
   },
   container: {
-    flex: 1, // Ocupa todo el espacio vertical disponible
+    flex: 1,
     marginTop: 20,
-    width: '100%', // Ancho completo
     padding: 30,
     backgroundColor: '#fff',
-    borderRadius: 15, // Esquinas redondeadas
+    borderRadius: 15,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
@@ -126,28 +135,31 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-    width: '100%', // Hace que el buscador ocupe todo el ancho
+    paddingHorizontal: 10,
+    marginBottom: 20,
   },
   lista: {
     flex: 1,
-    paddingHorizontal: 10, // Ajuste de espacio horizontal
   },
   scrollContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   userItem: {
-    width: '24%', // Ajusta el ancho para que haya 4 elementos por fila
-    aspectRatio: 1, // Esto mantiene la relación de aspecto cuadrada
-    backgroundColor: '#f9f9f9',
-    borderRadius: 5,
-    margin: 5, // Espacio entre los items
-    padding: 8, // Reduce el padding dentro del cuadrado
-    alignItems: 'center', // Centra el contenido dentro de cada item
-    justifyContent: 'center', // Centra verticalmente
+    width: '24%', // Ajusta el ancho para que haya 4 por fila
+    aspectRatio: 1, // Relación de aspecto cuadrada
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
   },
   userName: {
     fontSize: 16,
@@ -156,18 +168,22 @@ const styles = StyleSheet.create({
   userEmail: {
     fontSize: 14,
     color: '#666',
+    marginTop: 5,
   },
-  userAccess: {
+  userRole: {
     fontSize: 12,
-    color: '#666',
+    color: '#333',
+    marginTop: 5,
   },
   userStatus: {
     fontSize: 12,
     color: '#666',
+    marginTop: 5,
   },
-  userJoined: {
-    fontSize: 12,
-    color: '#666',
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
