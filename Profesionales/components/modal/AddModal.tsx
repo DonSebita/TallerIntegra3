@@ -15,10 +15,7 @@ interface ModalRegistroUsuarioProps {
   onSave: (userData: any) => void;
 }
 
-const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({
-  onCancel,
-  onSave,
-}) => {
+const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({ onCancel, onSave }) => {
   const [formData, setFormData] = useState({
     rut: '',
     primer_nombre: '',
@@ -35,9 +32,25 @@ const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({
     celular: '',
     contrasena: '',
     rol: '',
+    validado: 1,
   });
   
-  const [fecha_nacimiento, setInputDate] = React.useState(undefined)
+  const [fecha_nacimiento, setInputDate] = useState<Date | undefined>(undefined);
+
+
+  const formatDate = ( date : any ) => {
+    if (!date) return '';
+    return `${date.getFullYear().toString().slice(-2)}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+  };
+  
+  const seteoFecha = ( date : any ) => {
+    const formattedDate = formatDate(date);
+    setInputDate(date);  
+    setFormData({
+      ...formData,
+      fecha_nacimiento: formattedDate, 
+    });
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -118,7 +131,7 @@ const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({
                 locale="es"
                 label="Fecha Nacimiento"
                 value={fecha_nacimiento}
-                onChange={(d : any) => setInputDate(d)}
+                onChange={seteoFecha}
                 inputMode="start"
                 style={styles.fechaN}
               />
@@ -144,12 +157,14 @@ const ModalRegistroUsuario: React.FC<ModalRegistroUsuarioProps> = ({
             />
             <TextInput
               style={styles.input}
+              keyboardType='numeric'
               placeholder="Teléfono"
               value={formData.telefono}
               onChangeText={(value) => handleInputChange('telefono', value)}
             />
             <TextInput
               style={styles.input}
+              keyboardType='numeric'
               placeholder="Celular"
               value={formData.celular}
               onChangeText={(value) => handleInputChange('celular', value)}
