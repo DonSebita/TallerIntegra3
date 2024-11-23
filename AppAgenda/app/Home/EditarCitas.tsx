@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, Text, StyleSheet, Alert, TouchableOpacity, Dimensions } from 'react-native';
+import { 
+    View, TextInput, FlatList, Text, StyleSheet, Alert, TouchableOpacity, Dimensions, Vibration 
+} from 'react-native';
 
 // Definimos la interfaz para los horarios
 interface Horario {
@@ -12,17 +14,17 @@ interface Horario {
 }
 
 const App = () => {
-    const [horarios, setHorarios] = useState<Horario[]>([]); // Para almacenar horarios disponibles globales
-    const [loading, setLoading] = useState(false); // Estado para indicar si se están cargando los datos
-    const [horarioSeleccionado, setHorarioSeleccionado] = useState<Horario | null>(null); // Horario seleccionado para crear cita
-    const [usuarioId, setUsuarioId] = useState(''); // ID del usuario
-    const [movilizacionId, setMovilizacionId] = useState(''); // ID de movilización
-    const [servicioId, setServicioId] = useState(''); // ID del servicio
+    const [horarios, setHorarios] = useState<Horario[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [horarioSeleccionado, setHorarioSeleccionado] = useState<Horario | null>(null);
+    const [usuarioId, setUsuarioId] = useState('');
+    const [movilizacionId, setMovilizacionId] = useState('');
+    const [servicioId, setServicioId] = useState('');
     const [windowWidth, setWindowWidth] = useState<number>(Dimensions.get('window').width);
 
     const isMobile = windowWidth < 768;
 
-    // Obtener todos los horarios disponibles
+    // Obtener horarios disponibles
     const obtenerHorarios = async () => {
         setLoading(true);
         try {
@@ -91,7 +93,9 @@ const App = () => {
 
     return (
         <View style={[styles.container, isMobile ? styles.mobileContainer : styles.desktopContainer]}>
-            <Text style={[styles.title, { fontSize: isMobile ? 20 : 24 }]}>Horarios Disponibles</Text>
+            <Text style={[styles.title, { fontSize: isMobile ? 20 : 24 }]} maxFontSizeMultiplier={1.5}>
+                Horarios Disponibles
+            </Text>
             {loading ? (
                 <Text style={styles.loadingText}>Cargando horarios...</Text>
             ) : (
@@ -101,11 +105,21 @@ const App = () => {
                     style={[isMobile ? styles.mobileList : styles.desktopList]}
                     renderItem={({ item }) => (
                         <TouchableOpacity
+                            accessible={true}
+                            accessibilityLabel={`Seleccionar horario del día ${item.dia}, de ${item.hora_inicio} a ${item.hora_fin}`}
+                            focusable={true}
                             style={[
                                 styles.horarioItem,
                                 horarioSeleccionado?.agenda_id === item.agenda_id && styles.horarioItemSelected,
                             ]}
-                            onPress={() => setHorarioSeleccionado(item)}
+                            onPress={() => {
+                                setHorarioSeleccionado(item);
+                                Vibration.vibrate(50);
+                                Alert.alert(
+                                    'Horario seleccionado',
+                                    `Seleccionaste el horario del día ${item.dia}`
+                                );
+                            }}
                         >
                             <Text style={styles.horarioText}>Día: {item.dia}</Text>
                             <Text style={styles.horarioText}>Hora: {item.hora_inicio} - {item.hora_fin}</Text>
@@ -117,28 +131,48 @@ const App = () => {
 
             <View style={[styles.formContainer, isMobile ? styles.mobileFormContainer : styles.desktopFormContainer]}>
                 <Text style={[styles.subtitle, { fontSize: isMobile ? 18 : 22 }]}>Reservar Cita</Text>
-                <TextInput
-                    style={[styles.input, { fontSize: isMobile ? 14 : 18 }]}
-                    value={usuarioId}
-                    onChangeText={setUsuarioId}
-                    placeholder="ID del Usuario"
-                    keyboardType="numeric"
-                />
-                <TextInput
-                    style={[styles.input, { fontSize: isMobile ? 14 : 18 }]}
-                    value={servicioId}
-                    onChangeText={setServicioId}
-                    placeholder="ID del Servicio"
-                    keyboardType="numeric"
-                />
-                <TextInput
-                    style={[styles.input, { fontSize: isMobile ? 14 : 18 }]}
-                    value={movilizacionId}
-                    onChangeText={setMovilizacionId}
-                    placeholder="ID de Movilización"
-                    keyboardType="numeric"
-                />
-                <TouchableOpacity style={styles.button} onPress={crearCita}>
+                <View>
+                    <Text style={styles.inputLabel}>ID del Usuario</Text>
+                    <TextInput
+                        style={[styles.input, { fontSize: isMobile ? 14 : 18 }]}
+                        value={usuarioId}
+                        onChangeText={setUsuarioId}
+                        placeholder="ID del Usuario"
+                        keyboardType="numeric"
+                        accessible={true}
+                        accessibilityLabel="Campo para ingresar el ID del usuario"
+                    />
+                </View>
+                <View>
+                    <Text style={styles.inputLabel}>ID del Servicio</Text>
+                    <TextInput
+                        style={[styles.input, { fontSize: isMobile ? 14 : 18 }]}
+                        value={servicioId}
+                        onChangeText={setServicioId}
+                        placeholder="ID del Servicio"
+                        keyboardType="numeric"
+                        accessible={true}
+                        accessibilityLabel="Campo para ingresar el ID del servicio"
+                    />
+                </View>
+                <View>
+                    <Text style={styles.inputLabel}>ID de Movilización</Text>
+                    <TextInput
+                        style={[styles.input, { fontSize: isMobile ? 14 : 18 }]}
+                        value={movilizacionId}
+                        onChangeText={setMovilizacionId}
+                        placeholder="ID de Movilización"
+                        keyboardType="numeric"
+                        accessible={true}
+                        accessibilityLabel="Campo para ingresar el ID de movilización"
+                    />
+                </View>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={crearCita}
+                    accessible={true}
+                    accessibilityLabel="Botón para crear cita"
+                >
                     <Text style={styles.buttonText}>Crear Cita</Text>
                 </TouchableOpacity>
             </View>
@@ -215,6 +249,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         backgroundColor: '#fff',
         borderRadius: 8,
+    },
+    inputLabel: {
+        fontSize: 16,
+        marginBottom: 5,
     },
     button: {
         backgroundColor: '#007bff',
