@@ -1,6 +1,7 @@
 import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
 import React from 'react';
 
+
 // Definimos la interfaz para los datos de las noticias
 interface Noticia {
   id: string;
@@ -15,19 +16,19 @@ const Index = () => {
       id: '1',
       titulo: 'Nueva tecnología para el cuidado de la salud',
       descripcion: 'Descubre cómo los avances tecnológicos están mejorando la vida de los adultos mayores.',
-      imagen: 'https://via.placeholder.com/100', // Reemplaza con una URL de imagen válida
+      imagen: 'https://www.digitales.es/img/blog/977ab912536318d1ada6e79d9269f2c3.png', // Reemplaza con una URL de imagen válida
     },
     {
       id: '2',
       titulo: 'Ejercicios para mantenerte activo',
       descripcion: 'Conoce rutinas simples y efectivas para mantenerte en forma desde casa.',
-      imagen: 'https://via.placeholder.com/100', // Reemplaza con una URL de imagen válida
+      imagen: 'https://images.ligup2.com/eyJidWNrZXQiOiJsaWd1cC12MiIsImtleSI6ImRlcG9ydGVtdW5pY2lwYWwvcGhvdG9zLzIxMjU4X3NlZGVfbG9zX2xhdXJlbGVzLnBuZyIsImVkaXRzIjp7InJlc2l6ZSI6eyJ3aWR0aCI6MTIwMCwiZml0IjoiY292ZXIifSwicm90YXRlIjpudWxsfX0=', // Reemplaza con una URL de imagen válida
     },
     {
       id: '3',
       titulo: 'Consejos para una alimentación saludable',
       descripcion: 'Aprende cómo una dieta equilibrada puede mejorar tu calidad de vida.',
-      imagen: 'https://via.placeholder.com/100', // Reemplaza con una URL de imagen válida
+      imagen: 'https://cdn.nutritionstudies.org/wp-content/uploads/2023/05/link-between-diet-and-pain-1024x536.jpg', // Reemplaza con una URL de imagen válida
     },
   ];
 
@@ -47,10 +48,11 @@ const Index = () => {
         source={{ uri: "https://www.shutterstock.com/image-vector/doctor-older-patient-sitting-on-600nw-1879445755.jpg" }} // Reemplaza con tu logo si es necesario
         style={styles.logo}
       />
-      <Text style={styles.title}>¡Bienvenido a Mi App!</Text>
+      <Text style={styles.title}>¡Ingresaste Bienvenido!</Text>
       <Text style={styles.subtitle}>
-        Una experiencia móvil increíble comienza aquí.
+        Tu experiencia comienza aquí.  
       </Text>
+      <Text style={styles.title}>Noticias</Text>
       <FlatList
         data={noticias}
         renderItem={renderNoticia}
@@ -82,7 +84,8 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    fontWeight: "bold",
+    color: "#333",
     textAlign: "center",
     marginBottom: 20,
   },
@@ -98,15 +101,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
-    width: '90%',
+    width: '100%',
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
   },
   imagenTarjeta: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     borderRadius: 10,
     marginRight: 15,
   },
@@ -115,14 +118,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tituloNoticia: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 5,
   },
   descripcionNoticia: {
     fontSize: 14,
-    color: '#666',
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 
