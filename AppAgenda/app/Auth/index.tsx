@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import LoginButton from "@/components/Buttons/LoginButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define el tipo de datos que manejará el formulario
@@ -78,7 +79,7 @@ const LoginForm: React.FC = () => {
   //       setErrorMessage('Hubo un problema con la solicitud. Por favor, intenta nuevamente.');
   //     }
   // };
-  const handleSubmit = async()=>{ router.push('/home')}  //<--------------esto es para ver que todo esta funcionando correctamente y editar otras pestañas sin iniciar sesion
+  const handleSubmit = async()=>{ router.push('/Home')}  //<--------------esto es para ver que todo esta funcionando correctamente y editar otras pestañas sin iniciar sesion
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -110,27 +111,37 @@ const LoginForm: React.FC = () => {
         <Text style={[styles.titulo, { fontSize: isMobile ? 30 : 50 }]}>Inicio de Sesion</Text>
         <Text style={[styles.subTitle, { fontSize: isMobile ? 20 : 30 }]}>Accede a tu cuenta</Text>
 
-        <TextInput
-          placeholder="RUT"
-          style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
-          value={formData.rut}
-          onChangeText={(value) => handleInputChange('rut', value)}
-        />
-        <TextInput
-          placeholder="Contraseña"
-          secureTextEntry={true}
-          style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
-          value={formData.contraseña}
-          onChangeText={(value) => handleInputChange('contraseña', value)}
-        />
-
-        <Button title="Iniciar Sesión" color="#00ae41" onPress={handleSubmit} />
+        <View style={[{ width: '100%' }, { alignItems: 'flex-start' }]}>
+          <Text style={[{ fontWeight: 'bold' }, { fontSize: 18 }]}>RUT (sin puntos y con guíon)</Text>
+          <TextInput
+            placeholder="RUT"
+            style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
+            value={formData.rut}
+            onChangeText={(value) => handleInputChange('rut', value)}
+          />
+          <Text style={[{ fontWeight: 'bold' }, { fontSize: 18 }]}>Contraseña</Text>
+          <TextInput
+            placeholder="Contraseña"
+            secureTextEntry={true}
+            style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
+            value={formData.contraseña}
+            onChangeText={(value) => handleInputChange('contraseña', value)}
+          />
+        </View>
+        
+        <LoginButton text="Iniciar Sesión" onPress={handleSubmit} />
 
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
         <TouchableOpacity onPress={() => router.push('/Auth/ForgotPassword')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             ¿Olvidaste tu contraseña?
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push('/Auth/Register')}>
+          <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
+            No Tengo Cuenta
           </Text>
         </TouchableOpacity>
       </View>

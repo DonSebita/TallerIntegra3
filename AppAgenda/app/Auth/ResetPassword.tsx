@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import LoginButton from "@/components/Buttons/LoginButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define el tipo de datos que manejará el formulario
@@ -50,7 +51,7 @@ const resetPasswordForm: React.FC = () => {
   
       if (response.ok) {
         Alert.alert('Éxito', 'Contraseña actualizada correctamente');
-        router.push('/Auth/Login');
+        router.push('/Auth');
       } else {
         const errorData = await response.json();
         setErrorMessage(
@@ -90,24 +91,28 @@ const resetPasswordForm: React.FC = () => {
       />
 
       <View style={[styles.form, isMobile ? { width: '100%' } : { width: '45%' }]}>
-        <Text style={[styles.titulo, { fontSize: isMobile ? 30 : 50 }]}>Inicio de Sesion</Text>
-        <Text style={[styles.subTitle, { fontSize: isMobile ? 20 : 30 }]}>Accede a tu cuenta</Text>
+        <Text style={[styles.titulo, { fontSize: isMobile ? 30 : 50 }]}>Creación de Nueva Contraseña</Text>
+        <Text style={[styles.subTitle, { fontSize: isMobile ? 20 : 30 }]}>Ingrese su código de validación y su nueva contraseña</Text>
 
-        <TextInput
-          placeholder="Codígo de Validación"
-          style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
-          value={formData.token}
-          onChangeText={(value) => handleInputChange('token', value)}
-        />
-        <TextInput
-          placeholder="Contraseña"
-          secureTextEntry={true}
-          style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
-          value={formData.contraseña}
-          onChangeText={(value) => handleInputChange('contraseña', value)}
-        />
+        <View style={[{ width: '100%' }, { alignItems: 'flex-start' }]}>
+          <Text style={[{ fontWeight: 'bold' }, { fontSize: 18 }]}>Código de Validación</Text>
+          <TextInput
+            placeholder="Código de Validación"
+            style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
+            value={formData.token}
+            onChangeText={(value) => handleInputChange('token', value)}
+          />
+          <Text style={[{ fontWeight: 'bold' }, { fontSize: 18 }]}>Nueva Contraseña</Text>
+          <TextInput
+            placeholder="Contraseña"
+            secureTextEntry={true}
+            style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
+            value={formData.contraseña}
+            onChangeText={(value) => handleInputChange('contraseña', value)}
+          />
+        </View>
 
-        <Button title="Crear Contraseña" color="#00ae41" onPress={handleSubmit} />
+        <LoginButton text="Crear Contraseña" onPress={handleSubmit} />
 
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
@@ -138,11 +143,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titulo: {
+    textAlign: 'center',
     marginTop: 20,
     fontWeight: 'bold',
     color: '#34434D',
   },
   subTitle: {
+    textAlign: 'center',
     color: 'gray',
     marginBottom: '2%',
   },
@@ -161,7 +168,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
   },
-  forgotPassword: {
+  goBackText: {
     color: '#007AFF',
     marginTop: 10,
     textAlign: 'center',

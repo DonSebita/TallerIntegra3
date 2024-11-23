@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import LoginButton from "@/components/Buttons/LoginButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define el tipo de datos que manejará el formulario
@@ -101,14 +102,23 @@ const forgotPasswordForm: React.FC = () => {
         <Text style={[styles.titulo, { fontSize: isMobile ? 30 : 50 }]}>Recuperación de Contraseña</Text>
         <Text style={[styles.subTitle, { fontSize: isMobile ? 20 : 30 }]}>Ingrese su Correo para Restablecer su Contraseña</Text>
 
-        <TextInput
-          placeholder="Correo"
-          style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
-          value={formData.correo}
-          onChangeText={(value) => handleInputChange('correo', value)}
-        />
+        <View style={[{ width: '100%' }, { alignItems: 'flex-start' }]}>
+          <Text style={[{ fontWeight: 'bold' }, { fontSize: 18 }]}>Correo</Text>
+          <TextInput
+            placeholder="Correo"
+            style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
+            value={formData.correo}
+            onChangeText={(value) => handleInputChange('correo', value)}
+          />
+        </View>
 
-        <Button title="Restablecer" color="#00ae41" onPress={handleSubmit} />
+        <LoginButton text="Restablecer" onPress={handleSubmit} />
+
+        <TouchableOpacity onPress={() => router.push('/Auth')}>
+          <Text style={[styles.goBackText, { fontSize: isMobile ? 14 : 16 }]}>
+            Volver atrás.
+          </Text>
+        </TouchableOpacity>
 
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
@@ -139,11 +149,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   titulo: {
+    textAlign: 'center',
     marginTop: 20,
     fontWeight: 'bold',
     color: '#34434D',
   },
   subTitle: {
+    textAlign: 'center',
     color: 'gray',
     marginBottom: '2%',
   },
@@ -162,7 +174,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
   },
-  forgotPassword: {
+  goBackText: {
     color: '#007AFF',
     marginTop: 10,
     textAlign: 'center',
