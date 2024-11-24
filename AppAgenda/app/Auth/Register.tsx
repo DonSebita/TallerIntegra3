@@ -107,7 +107,7 @@ interface FormData {
       if (response.ok) {
         const data = await response.json();
         Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
-        router.push('/Auth'); // Redirigir al login
+        router.push('/auth'); // Redirigir al login
       } else {
         const errorData = await response.json();
         // Manejar errores específicos devueltos por el servidor
@@ -333,7 +333,7 @@ interface FormData {
         
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-        <TouchableOpacity onPress={() => router.push('/Auth')}>
+        <TouchableOpacity onPress={() => router.push('/auth')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             Ya tengo una cuenta.
           </Text>

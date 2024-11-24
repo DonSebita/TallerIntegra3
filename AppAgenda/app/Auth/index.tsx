@@ -79,7 +79,7 @@ const LoginForm: React.FC = () => {
   //       setErrorMessage('Hubo un problema con la solicitud. Por favor, intenta nuevamente.');
   //     }
   // };
-  const handleSubmit = async()=>{ router.push('/Home')}  //<--------------esto es para ver que todo esta funcionando correctamente y editar otras pestañas sin iniciar sesion
+  const handleSubmit = async()=>{ router.push('/home')}  //<--------------esto es para ver que todo esta funcionando correctamente y editar otras pestañas sin iniciar sesion
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -133,13 +133,13 @@ const LoginForm: React.FC = () => {
 
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-        <TouchableOpacity onPress={() => router.push('/Auth/ForgotPassword')}>
+        <TouchableOpacity onPress={() => router.push('/auth/ForgotPassword')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             ¿Olvidaste tu contraseña?
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/Auth/Register')}>
+        <TouchableOpacity onPress={() => router.push('/auth/Register')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             No Tengo Cuenta
           </Text>

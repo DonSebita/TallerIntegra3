@@ -50,7 +50,6 @@ const UserDetail = () => {
   ) || [];
 
   const handleVerification = async () => {
-    // Aquí iría la lógica para cambiar el estado de verificación en el backend
     console.log('Cambiando estado de verificación...');
   };
 
@@ -155,6 +154,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    borderColor: 'rgba(0,0,0,0.1)',
   },
   userHeader: {
     flexDirection: 'row',
@@ -245,6 +245,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
+    borderColor: 'rgba(0,0,0,0.1)',
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
