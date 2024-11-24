@@ -4,7 +4,8 @@ import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, To
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import LoginButton from "@/components/Buttons/LoginButton";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Checkbox } from "@/components/ui/checkbox";
+
 
 // Define el tipo de datos que manejará el formulario
 interface FormData {
@@ -47,6 +48,7 @@ interface FormData {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState<number>(Dimensions.get('window').width);
   const [windowHeight, setWindowHeight] = useState<number>(Dimensions.get('window').height);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const isMobile = windowWidth < 768;
 
@@ -120,7 +122,10 @@ interface FormData {
       Alert.alert('Error', 'Hubo un problema en la conexión. Intenta nuevamente.');
     }
   };
-  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };  
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -309,6 +314,16 @@ interface FormData {
             onChangeText={(value) => handleInputChange('contrasena' as keyof FormData, value)}
           />
         </View>
+        <View style={styles.checkboxContainer}>
+            <Checkbox
+              id="show-password"
+              checked={showPassword}
+              onCheckedChange={togglePasswordVisibility}
+            />
+            <Text style={styles.checkboxLabel} onPress={togglePasswordVisibility}>
+              Mostrar contraseña
+            </Text>
+          </View>
 
         <View style={[styles.buttons]}>
           {currentStep > 0 && (
@@ -397,6 +412,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 20,
     alignItems: 'center',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#34434D',
   },
 });
 

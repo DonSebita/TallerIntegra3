@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, Button, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Image, Alert, Dimensions, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import LoginButton from "@/components/Buttons/LoginButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Checkbox } from "@/components/ui/checkbox";
 
-// Define el tipo de datos que manejará el formulario
 interface FormData {
   rut: string;
   contraseña: string;
@@ -21,6 +21,7 @@ const LoginForm: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState<number>(Dimensions.get('window').width);
   const [windowHeight, setWindowHeight] = useState<number>(Dimensions.get('window').height);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const isMobile = windowWidth < 768;
 
@@ -31,65 +32,58 @@ const LoginForm: React.FC = () => {
     });
   };
 
-  // const handleSubmit = async () => {
-  //   // Validación inicial del formulario
-  //   if (!formData.rut || !formData.contraseña) {
-  //     setErrorMessage('Por favor, completa todos los campos.');
-  //     return;
-  //   }
+  const handleSubmit = async () => {
+    // Validación inicial del formulario
+    if (!formData.rut || !formData.contraseña) {
+      setErrorMessage('Por favor, completa todos los campos.');
+      return;
+    }
   
-  //   try {
-  //     // Realizar la solicitud al servidor
-  //     const response = await fetch('http://localhost:3000/auth/login', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         rut: formData.rut,
-  //         contraseña: formData.contraseña,
-  //       }),
-  //     });
+    try {
+      // Realizar la solicitud al servidor
+      const response = await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rut: formData.rut,
+          contraseña: formData.contraseña,
+        }),
+      });
   
-  //     // Si la solicitud es exitosa
-  //       if (response.ok) {
-  //         const userData = await response.json();
-    
-  //         // Almacenar el token en AsyncStorage si está presente
-  //         if (userData.token) {
-  //           await AsyncStorage.setItem('token', userData.token);
-  //           Alert.alert('Éxito', 'Inicio de sesión exitoso.');
-  //           router.push('/home'); 
-  //         } else {
-  //           setErrorMessage('No se recibió un token válido del servidor.');
-  //         }
-  //       } else if (response.status === 403) {
-  //         // Caso específico: cuenta no validada
-  //         setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
-  //       } else {
-  //         // Otros errores: mostrar mensaje específico del servidor si está disponible
-  //         const errorData = await response.json();
-  //         setErrorMessage(
-  //           errorData.message || 'Hubo un problema al iniciar sesión. Verifica tus credenciales.'
-  //         );
-  //       }
-  //     } catch (error) {
-  //       // Manejo de errores de red o problemas en la solicitud
-  //       console.error('Error:', error);
-  //       setErrorMessage('Hubo un problema con la solicitud. Por favor, intenta nuevamente.');
-  //     }
-  // };
-  const handleSubmit = async()=>{ router.push('/home')}  //<--------------esto es para ver que todo esta funcionando correctamente y editar otras pestañas sin iniciar sesion
+      // Si la solicitud es exitosa
+      if (response.ok) {
+        const userData = await response.json();
 
-  useEffect(() => {
-    const updateDimensions = () => {
-      setWindowWidth(Dimensions.get('window').width);
-      setWindowHeight(Dimensions.get('window').height);
-    };
+        // Almacenar el token en AsyncStorage si está presente
+        if (userData.token) {
+          await AsyncStorage.setItem('token', userData.token);
+          Alert.alert('Éxito', 'Inicio de sesión exitoso.');
+          router.push('/Home'); 
+        } else {
+          setErrorMessage('No se recibió un token válido del servidor.');
+        }
+      } else if (response.status === 403) {
+        // Caso específico: cuenta no validada
+        setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
+      } else {
+        // Otros errores: mostrar mensaje específico del servidor si está disponible
+        const errorData = await response.json();
+        setErrorMessage(
+          errorData.message || 'Hubo un problema al iniciar sesión. Verifica tus credenciales.'
+        );
+      }
+    } catch (error) {
+      // Manejo de errores de red o problemas en la solicitud
+      console.error('Error:', error);
+      setErrorMessage('Hubo un problema con la solicitud. Por favor, intenta nuevamente.');
+    }
+  };
 
-    const subscription = Dimensions.addEventListener('change', updateDimensions);
-    return () => subscription.remove();
-  }, []);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
     <View
@@ -122,11 +116,21 @@ const LoginForm: React.FC = () => {
           <Text style={[{ fontWeight: 'bold' }, { fontSize: 18 }]}>Contraseña</Text>
           <TextInput
             placeholder="Contraseña"
-            secureTextEntry={true}
+            secureTextEntry={!showPassword}
             style={[styles.textInput, { fontSize: isMobile ? 16 : 20 }]}
             value={formData.contraseña}
             onChangeText={(value) => handleInputChange('contraseña', value)}
           />
+          <View style={styles.checkboxContainer}>
+            <Checkbox
+              id="show-password"
+              checked={showPassword}
+              onCheckedChange={togglePasswordVisibility}
+            />
+            <Text style={styles.checkboxLabel} onPress={togglePasswordVisibility}>
+              Mostrar contraseña
+            </Text>
+          </View>
         </View>
         
         <LoginButton text="Iniciar Sesión" onPress={handleSubmit} />
@@ -189,6 +193,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: '5%',
   },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#34434D',
+  },
   errorText: {
     color: 'red',
     marginTop: 10,
@@ -202,3 +216,4 @@ const styles = StyleSheet.create({
 });
 
 export default LoginForm;
+
