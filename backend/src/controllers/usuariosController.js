@@ -27,6 +27,64 @@ exports.getUsuarios = async (req, res) => {
     }
 };
 
+// usuariosController.js
+exports.verificarUsuario = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).send('ID del usuario es requerido.');
+    }
+
+    try {
+        const updateQuery = `
+            UPDATE usuarios 
+            SET validado = 1 
+            WHERE usuario_id = ?
+        `;
+
+        const result = await query(updateQuery, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Usuario no encontrado.');
+        }
+
+        res.status(200).send('Usuario verificado exitosamente.');
+    } catch (error) {
+        console.error('Error al verificar el usuario:', error);
+        res.status(500).send('Error al verificar el usuario.');
+    }
+};
+
+
+
+// Borrar un usuario según el ID
+exports.borrarUsuario = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).send('ID del usuario es requerido.');
+    }
+
+    try {
+        const deleteQuery = `
+            DELETE FROM usuarios 
+            WHERE usuario_id = ?
+        `;
+
+        const result = await query(deleteQuery, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Usuario no encontrado.');
+        }
+
+        res.status(200).send('Usuario eliminado exitosamente.');
+    } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+        res.status(500).send('Error al eliminar el usuario.');
+    }
+};
+
+
 // Obtener detalles de un usuario por ID
 exports.getUsuarioDetalles = async (req, res) => {
     const { id } = req.params;
