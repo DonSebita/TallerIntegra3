@@ -14,21 +14,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Configuración de la base de datos MySQL
-const db = mysql.createConnection({
-    host: '45.236.129.172',       // Dirección de tu base de datos
-    user: 'ti',                   // Usuario de la base de datos
-    password: 'tallerIntegracion3', // Contraseña del usuario
-    database: 'Ti3',              // Nombre de la base de datos
-});
-
-// Conectar a la base de datos
-db.connect((err) => {
-    if (err) {
-        console.error('Error al conectar a la base de datos:', err);
-        return;
-    }
-    console.log('Conexión a la base de datos establecida.');
-});
+const db = require('./config/db.js'); // Importa la conexión a la base de datos
 
 // Configura CORS
 const corsOptions = {
@@ -62,35 +48,6 @@ app.use('/api/agenda', agendaRoutes);
 // Ruta base para verificar que el servidor está corriendo
 app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente!');
-});
-
-// Endpoint para crear una cita
-app.post('/api/citas/crear-cita', (req, res) => {
-    const { usuario_id, profesional_id, agenda_id, servicio_id, movilizacion_id } = req.body;
-
-    // Validar los datos enviados
-    if (!usuario_id || !profesional_id || !agenda_id || !servicio_id || !movilizacion_id) {
-        return res.status(400).json({ message: 'Todos los campos son obligatorios.' });
-    }
-
-    // Crear la consulta SQL
-    const query = `
-        INSERT INTO citas (usuario_id, profesional_id, agenda_id, servicio_id, movilizacion_id)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-
-    // Ejecutar la consulta
-    db.query(query, [usuario_id, profesional_id, agenda_id, servicio_id, movilizacion_id], (err, result) => {
-        if (err) {
-            console.error('Error al insertar la cita en la base de datos:', err);
-            return res.status(500).json({ message: 'Error al crear la cita.' });
-        }
-
-        res.status(201).json({
-            message: 'Cita creada exitosamente.',
-            citaId: result.insertId,
-        });
-    });
 });
 
 // Iniciar el servidor
