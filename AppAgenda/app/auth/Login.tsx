@@ -1,34 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   StyleSheet, 
   View, 
   Text, 
   TextInput, 
   Alert, 
+  Dimensions,
   TouchableOpacity,
   Image,
   ImageBackground,
-  useWindowDimensions,
-  ScrollView,
+  Platform,
   KeyboardAvoidingView,
-  Platform
+  ScrollView,
+  useWindowDimensions
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
 
 interface FormData {
-  correo: string;
+  rut: string;
+  contraseña: string;
 }
 
-const ForgotPasswordForm: React.FC = () => {
+const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-    correo: '',
+    rut: '',
+    contraseña: '',
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const {width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth } = useWindowDimensions();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const isMobile = windowWidth < 768;
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', updateLayout);
+    return () => subscription.remove();
+  }, []);
+
+  const updateLayout = () => {
+    // The width will be automatically updated by useWindowDimensions
+  };
 
   const handleInputChange = (name: keyof FormData, value: string) => {
     setFormData({
@@ -38,29 +53,38 @@ const ForgotPasswordForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!formData.correo) {
-      setErrorMessage('Por favor, ingresa tu correo electrónico.');
+    if (!formData.rut || !formData.contraseña) {
+      setErrorMessage('Por favor, completa todos los campos.');
       return;
     }
-
+  
     try {
-      const response = await fetch('http://localhost:3000/api/password/forgot-password', {
+      const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          correo: formData.correo,
+          rut: formData.rut,
+          contraseña: formData.contraseña,
         }),
       });
-
+  
       if (response.ok) {
-        Alert.alert('Éxito', 'Se ha enviado un correo con las instrucciones para restablecer tu contraseña.');
-        router.push('/auth/ResetPassword');
+        const userData = await response.json();
+        if (userData.token) {
+          await AsyncStorage.setItem('token', userData.token);
+          Alert.alert('Éxito', 'Inicio de sesión exitoso.');
+          router.push('/home');
+        } else {
+          setErrorMessage('No se recibió un token válido del servidor.');
+        }
+      } else if (response.status === 403) {
+        setErrorMessage('Tu cuenta aún no ha sido validada. Contacta al administrador.');
       } else {
         const errorData = await response.json();
         setErrorMessage(
-          errorData.message || 'Hubo un problema al procesar tu solicitud. Por favor, intenta nuevamente.'
+          errorData.message || 'Hubo un problema al iniciar sesión. Verifica tus credenciales.'
         );
       }
     } catch (error) {
@@ -83,39 +107,58 @@ const ForgotPasswordForm: React.FC = () => {
               resizeMode="contain"
             />
           )}
-          <Text style={styles.loginHeader}>Recuperación de Contraseña</Text>
+          <Text style={styles.loginHeader}>Inicio de Sesión</Text>
           <Text style={styles.loginSubtext}>
-            Ingresa tu correo para restablecer tu contraseña.
+            Accede a tu cuenta.
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Correo Electrónico</Text>
+            <Text style={styles.inputLabel}>RUT (sin puntos y con guión)</Text>
             <View style={styles.inputWrapper}>
               <TextInput
                 style={styles.input}
-                placeholder="Correo Electrónico"
+                placeholder="RUT"
                 placeholderTextColor="#A0A0A0"
-                value={formData.correo}
-                onChangeText={(value) => handleInputChange('correo', value)}
-                keyboardType="email-address"
-                autoCapitalize="none"
+                value={formData.rut}
+                onChangeText={(value) => handleInputChange('rut', value)}
               />
             </View>
+
+            <Text style={styles.inputLabel}>Contraseña</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                placeholderTextColor="#A0A0A0"
+                secureTextEntry={!showPassword}
+                value={formData.contraseña}
+                onChangeText={(value) => handleInputChange('contraseña', value)}
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                <Feather name={showPassword ? "eye-off" : "eye"} size={20} color="#A0A0A0" />
+              </TouchableOpacity>
+            </View>
           </View>
+
+          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
           <TouchableOpacity 
             style={styles.loginButton}
             onPress={handleSubmit}
           >
-            <Text style={styles.loginButtonText}>Restablecer Contraseña</Text>
+            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('/auth/Login')}>
-            <Text style={styles.linkText}>Volver al inicio de sesión</Text>
+          <TouchableOpacity onPress={() => router.push('/auth/ForgotPassword')}>
+            <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
           </TouchableOpacity>
 
-          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+          <TouchableOpacity onPress={() => router.push('/auth/Register')}>
+            <Text style={styles.linkText}>¿No tienes una cuenta? Regístrate</Text>
+          </TouchableOpacity>
+
         </View>
+
         {!isMobile && (
           <View style={styles.rightSection}>
             <ImageBackground
@@ -140,9 +183,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexDirection: 'row',
   },
-  content: {
-    padding: 40,
-  },
   leftSection: {
     flex: 1,
     padding: 40,
@@ -152,11 +192,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#47b564',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-  rightImage: {
+  rightImage: {    
     width: '90%',
-    height: '90%'
+    height: '90%',
   },
   logo: {
     width: 200,
@@ -175,20 +215,26 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   inputContainer: {
+    gap: 16,
     marginBottom: 24,
   },
   inputLabel: {
-    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 8,
+    fontSize: 18,
   },
   inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#F3F4F6',
     borderRadius: 8,
     padding: 12,
   },
   input: {
+    flex: 1,
     fontSize: 16,
+  },
+  eyeIcon: {
+    padding: 4,
   },
   loginButton: {
     backgroundColor: '#47b564',
@@ -215,5 +261,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgotPasswordForm;
+export default LoginForm;
 

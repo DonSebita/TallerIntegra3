@@ -61,7 +61,7 @@ const ResetPasswordForm: React.FC = () => {
   
       if (response.ok) {
         Alert.alert('Éxito', 'Contraseña actualizada correctamente');
-        router.push('/auth');
+        router.push('/auth/Login');
       } else {
         const errorData = await response.json();
         setErrorMessage(
@@ -123,7 +123,7 @@ const ResetPasswordForm: React.FC = () => {
 
           {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-          <TouchableOpacity onPress={() => router.push('/auth')}>
+          <TouchableOpacity onPress={() => router.push('/auth/Login')}>
             <Text style={styles.linkText}>Volver al inicio de sesión</Text>
           </TouchableOpacity>
         </View>

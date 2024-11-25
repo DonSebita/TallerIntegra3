@@ -113,7 +113,7 @@ const RegisterForm: React.FC = () => {
   
       if (response.ok) {
         Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
-        router.push('/auth');
+        router.push('/auth/Login');
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData?.message || 'Hubo un problema al registrarse. Intenta nuevamente.');
@@ -227,7 +227,7 @@ const RegisterForm: React.FC = () => {
           </View>
 
 
-          <TouchableOpacity onPress={() => router.push('/auth')}>
+          <TouchableOpacity onPress={() => router.push('/auth/Login')}>
             <Text style={styles.linkText}>Ya tengo una cuenta</Text>
           </TouchableOpacity>
         </View>
