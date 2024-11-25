@@ -208,6 +208,37 @@ exports.obtenerCitasPorUsuario = async (req, res) => {
     }
 };
 
+exports.verCitasUsuario = async (req, res) => {
+    const { usuarioId } = req.params; // Obtener el ID del usuario desde los parámetros
+    if (!usuarioId) {
+        return res.status(400).send('El ID del usuario es requerido.');
+    }
+
+    try {
+        const obtenerCitasQuery = `
+            SELECT 
+                cita_id,
+                servicio_id,
+                profesional_id,
+                fecha_cita,
+                estado_cita
+            FROM citas
+            WHERE usuario_id = ?
+        `;
+        const citas = await query(obtenerCitasQuery, [usuarioId]);
+
+        if (citas.length === 0) {
+            return res.status(404).send('No hay citas agendadas para este usuario.');
+        }
+
+        res.status(200).json(citas);
+    } catch (error) {
+        console.error('Error al obtener citas del usuario:', error);
+        res.status(500).send('Error al obtener las citas del usuario.');
+    }
+};
+
+
 exports.obtenerHorariosDisponiblesGlobales = async (req, res) => {
     try {
         const obtenerHorariosQuery = `

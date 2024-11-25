@@ -137,13 +137,13 @@ const LoginForm: React.FC = () => {
 
         {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-        <TouchableOpacity onPress={() => router.push('/auth/ForgotPassword')}>
+        <TouchableOpacity onPress={() => router.push('/Auth/ForgotPassword')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             ¿Olvidaste tu contraseña?
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/auth/Register')}>
+        <TouchableOpacity onPress={() => router.push('/Auth/Register')}>
           <Text style={[styles.forgotPassword, { fontSize: isMobile ? 14 : 16 }]}>
             No Tengo Cuenta
           </Text>
