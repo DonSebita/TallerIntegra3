@@ -314,7 +314,7 @@ interface FormData {
             onChangeText={(value) => handleInputChange('contrasena' as keyof FormData, value)}
           />
         </View>
-        <View style={styles.checkboxContainer}>
+        <View style={[styles.checkboxContainer, { display: currentStep === 6 ? 'flex' : 'none' },]}>
             <Checkbox
               id="show-password"
               checked={showPassword}
@@ -323,7 +323,7 @@ interface FormData {
             <Text style={styles.checkboxLabel} onPress={togglePasswordVisibility}>
               Mostrar contraseña
             </Text>
-          </View>
+        </View>
 
         <View style={[styles.buttons]}>
           {currentStep > 0 && (
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 20,
   },
   checkboxLabel: {
