@@ -6,6 +6,9 @@ const _layout = () => {
   return (
     <Stack>
         <Stack.Screen name='index' options={{headerShown: false,}}/>
+        <Stack.Screen name='ForgotPassword' options={{headerShown: false,}}/>
+        <Stack.Screen name='Register' options={{headerShown: false,}}/>
+        <Stack.Screen name='ResetPassword' options={{headerShown: false,}}/>
     </Stack>
   )
 }

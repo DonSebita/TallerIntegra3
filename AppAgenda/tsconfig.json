@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/Home/index.tsx", "components/NavegacionInferior.js"  ]
+, "app/home/index.tsx", "components/NavegacionInferior.js"  ]
 }
