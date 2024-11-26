@@ -62,7 +62,7 @@ export default function Login() {
     }
     
     try {
-      const response: any = await fetchWithTimeout("http://localhost:3000/auth/login", {
+      const response: any = await fetchWithTimeout("https://backti.duckdns.org/auth/login-admin", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

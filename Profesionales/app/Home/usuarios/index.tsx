@@ -24,7 +24,7 @@ const UserList = () => {
     // Obtener usuarios desde el backend
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/usuarios'); // Cambia la URL según tu backend
+        const response = await fetch('https://backti.duckdns.org/api/usuarios'); // Cambia la URL según tu backend
         const data: User[] = await response.json();
         setUsers(data);
         setFilteredUsers(data); // Inicialmente mostrar todos los usuarios

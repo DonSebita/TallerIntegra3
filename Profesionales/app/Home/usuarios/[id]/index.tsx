@@ -31,7 +31,7 @@ const UserDetail = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/usuarios/${id}`);
+        const response = await fetch(`https://backti.duckdns.org/api/usuarios/${id}`);
         const data: User = await response.json();
         setUser(data);
       } catch (error) {
