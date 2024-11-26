@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f0f4f7',
+        backgroundColor: '#fff'
     },
     desktopContainer: {
         flexDirection: 'row',
@@ -194,15 +194,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     title: {
-        fontSize: 22,
+        fontSize: 30,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 8,
         textAlign: 'center',
+        color: '#333',
     },
     subtitle: {
-        fontWeight: 'bold',
+        fontSize: 25,
+        color: '#666',
         marginTop: 20,
         marginBottom: 10,
+        textAlign: 'center',
     },
     loadingText: {
         fontSize: 16,
@@ -218,7 +221,7 @@ const styles = StyleSheet.create({
     },
     horarioItem: {
         padding: 15,
-        backgroundColor: '#fff',
+        backgroundColor: '#F3F4F6',
         borderWidth: 1,
         borderColor: '#ddd',
         borderRadius: 8,
@@ -226,15 +229,16 @@ const styles = StyleSheet.create({
     },
     horarioItemSelected: {
         backgroundColor: '#cce5ff',
-        borderColor: '#007bff',
+        borderColor: '#47b564',
     },
     horarioText: {
         fontSize: 16,
+        color: '#333',
     },
     formContainer: {
         padding: 15,
         borderRadius: 8,
-        backgroundColor: '#fff',
+        backgroundColor: '#F3F4F6',
     },
     desktopFormContainer: {
         width: '35%',
@@ -244,25 +248,29 @@ const styles = StyleSheet.create({
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 10,
+        borderColor: '#ddd',
+        padding: 12,
         marginBottom: 10,
-        backgroundColor: '#fff',
+        backgroundColor: '#F3F4F6',
         borderRadius: 8,
+        fontSize: 16,
     },
     inputLabel: {
-        fontSize: 16,
-        marginBottom: 5,
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginBottom: 8,
+        color: '#333',
     },
     button: {
-        backgroundColor: '#007bff',
-        paddingVertical: 10,
+        backgroundColor: '#47b564',
+        paddingVertical: 16,
         borderRadius: 8,
         alignItems: 'center',
     },
     buttonText: {
         color: '#fff',
         fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
