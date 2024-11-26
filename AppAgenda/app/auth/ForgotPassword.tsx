@@ -44,7 +44,7 @@ const ForgotPasswordForm: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/password/forgot-password', {
+      const response = await fetch('https://backti.duckdns.org/api/password/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

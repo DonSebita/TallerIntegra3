@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  Alert, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Alert,
   TouchableOpacity,
   Image,
   ImageBackground,
@@ -94,23 +94,23 @@ const RegisterForm: React.FC = () => {
       'correo',
       'contrasena',
     ];
-  
+
     for (const field of requiredFields) {
       if (!formData[field as keyof FormData]) {
         setErrorMessage(`El campo ${field.replace('_', ' ')} es obligatorio.`);
         return;
       }
     }
-  
+
     try {
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch('https://backti.duckdns.org/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (response.ok) {
         Alert.alert('Registro exitoso', '¡El usuario ha sido registrado con éxito!');
         router.push('/auth/Login');
@@ -146,7 +146,7 @@ const RegisterForm: React.FC = () => {
   );
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
@@ -184,7 +184,7 @@ const RegisterForm: React.FC = () => {
           )}
           {currentStep === 3 && (
             <>
-              {renderInput('fecha_nacimiento', 'Fecha de Nacimiento', 'Fecha de Nacimiento')}
+              {renderInput('fecha_nacimiento', 'Fecha de Nacimiento (Año-Mes-Día)', 'Fecha de Nacimiento')}
               {renderInput('ciudad', 'Ciudad', 'Ciudad')}
             </>
           )}
@@ -211,14 +211,14 @@ const RegisterForm: React.FC = () => {
 
           <View style={styles.buttonContainer}>
             {currentStep > 0 && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.button, styles.backButton]}
                 onPress={handleBack}
               >
                 <Text style={styles.buttonText}>Volver</Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.button, styles.nextButton]}
               onPress={handleNext}
             >

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    View, TextInput, FlatList, Text, StyleSheet, Alert, TouchableOpacity, Dimensions, Vibration 
+import {
+    View, TextInput, FlatList, Text, StyleSheet, Alert, TouchableOpacity, Dimensions, Vibration
 } from 'react-native';
 
 // Definimos la interfaz para los horarios
@@ -28,7 +28,7 @@ const App = () => {
     const obtenerHorarios = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3000/api/citas/disponibles');
+            const response = await fetch('https://backti.duckdns.org/api/citas/disponibles');
             if (response.ok) {
                 const data: Horario[] = await response.json();
                 setHorarios(data);
@@ -64,7 +64,7 @@ const App = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/api/citas/crear-cita', {
+            const response = await fetch('https://backti.duckdns.org/api/citas/crear-cita', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

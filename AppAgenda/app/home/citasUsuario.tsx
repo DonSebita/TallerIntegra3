@@ -43,7 +43,7 @@ const CitasUsuario = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/citas/usuario/${userId}`);
+      const response = await fetch(`https://backti.duckdns.org/api/citas/usuario/${userId}`);
       if (response.ok) {
         const data: Cita[] = await response.json();
         setCitas(data);
