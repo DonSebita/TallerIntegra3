@@ -49,7 +49,7 @@ const ResetPasswordForm: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/password/reset-password/${formData.token}`,
+        `https://backti.duckdns.org/api/password/reset-password/${formData.token}`,
         {
           method: 'PATCH',
           headers: {

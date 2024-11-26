@@ -18,25 +18,25 @@ const Home = () => {
       {/* Botones de navegación */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={[styles.button, styles.agendarButton]}>
-          <Link href="/Home/guardarCitas" style={styles.buttonText}>
+          <Link href="/home/guardarCitas" style={styles.buttonText}>
             Agendar Cita
           </Link>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.historialButton]}>
-          <Link href="/Home/citasUsuario" style={styles.buttonText}>
+          <Link href="/home/citasUsuario" style={styles.buttonText}>
             Historial de Citas
           </Link>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.editarButton]}>
-          <Link href="/Home/EditarCitas" style={styles.buttonText}>
+          <Link href="/home/EditarCitas" style={styles.buttonText}>
             Editar/Cancelar Citas
           </Link>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, styles.noticiasButton]}>
-          <Link href="/Home/noticias" style={styles.buttonText}>
+          <Link href="/home/noticias" style={styles.buttonText}>
             Noticias
           </Link>
         </TouchableOpacity>
