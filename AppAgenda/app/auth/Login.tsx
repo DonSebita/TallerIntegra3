@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  Alert, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Alert,
   Dimensions,
   TouchableOpacity,
   Image,
@@ -57,7 +57,7 @@ const LoginForm: React.FC = () => {
       setErrorMessage('Por favor, completa todos los campos.');
       return;
     }
-  
+
     try {
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
@@ -69,7 +69,7 @@ const LoginForm: React.FC = () => {
           contraseña: formData.contraseña,
         }),
       });
-  
+
       if (response.ok) {
         const userData = await response.json();
         if (userData.token) {
@@ -94,7 +94,7 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
@@ -142,7 +142,7 @@ const LoginForm: React.FC = () => {
 
           {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.loginButton}
             onPress={handleSubmit}
           >
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rightImage: {    
+  rightImage: {
     width: '90%',
     height: '90%',
   },
@@ -242,6 +242,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 24,
+    marginTop: 20,
   },
   loginButtonText: {
     color: '#fff',

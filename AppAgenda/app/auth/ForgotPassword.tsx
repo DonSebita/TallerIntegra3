@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  Alert, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Alert,
   TouchableOpacity,
   Image,
   ImageBackground,
@@ -26,7 +26,7 @@ const ForgotPasswordForm: React.FC = () => {
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const {width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth } = useWindowDimensions();
 
   const isMobile = windowWidth < 768;
 
@@ -70,7 +70,7 @@ const ForgotPasswordForm: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
@@ -103,7 +103,9 @@ const ForgotPasswordForm: React.FC = () => {
             </View>
           </View>
 
-          <TouchableOpacity 
+          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+
+          <TouchableOpacity
             style={styles.loginButton}
             onPress={handleSubmit}
           >
@@ -114,7 +116,6 @@ const ForgotPasswordForm: React.FC = () => {
             <Text style={styles.linkText}>Volver al inicio de sesión</Text>
           </TouchableOpacity>
 
-          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
         </View>
         {!isMobile && (
           <View style={styles.rightSection}>
@@ -196,6 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 24,
+    marginTop: 20,
   },
   loginButtonText: {
     color: '#fff',

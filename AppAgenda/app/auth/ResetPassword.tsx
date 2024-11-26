@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  Alert, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Alert,
   TouchableOpacity,
   Image,
   ImageBackground,
@@ -29,7 +29,7 @@ const ResetPasswordForm: React.FC = () => {
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const {width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth } = useWindowDimensions();
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const isMobile = windowWidth < 768;
@@ -46,7 +46,7 @@ const ResetPasswordForm: React.FC = () => {
       setErrorMessage('Por favor, completa todos los campos.');
       return;
     }
-  
+
     try {
       const response = await fetch(
         `http://localhost:3000/api/password/reset-password/${formData.token}`,
@@ -58,7 +58,7 @@ const ResetPasswordForm: React.FC = () => {
           body: JSON.stringify({ contraseña: formData.contraseña }),
         }
       );
-  
+
       if (response.ok) {
         Alert.alert('Éxito', 'Contraseña actualizada correctamente');
         router.push('/auth/Login');
@@ -75,7 +75,7 @@ const ResetPasswordForm: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
@@ -117,11 +117,11 @@ const ResetPasswordForm: React.FC = () => {
             </View>
           </View>
 
+          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Crear Contraseña</Text>
           </TouchableOpacity>
-
-          {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
           <TouchableOpacity onPress={() => router.push('/auth/Login')}>
             <Text style={styles.linkText}>Volver al inicio de sesión</Text>
