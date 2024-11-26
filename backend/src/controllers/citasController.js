@@ -178,6 +178,32 @@ exports.obtenerCitasPorUsuario = async (req, res) => {
     }
   };
 
+  exports.cancelarCita = async (req, res) => {
+    const { citaId } = req.params;
+    console.log(`Solicitud para cancelar la cita con ID: ${citaId}`);
+  
+    try {
+        const query = `
+            UPDATE citas 
+            SET citas_canceladas = 1, estado_cita = 'cancelada' 
+            WHERE cita_id = ? AND citas_canceladas = 0
+        `;
+        const result = await db.promise().query(query, [citaId]);
+  
+        if (result[0].affectedRows === 0) {
+            return res.status(404).send({ message: 'La cita no existe o ya está cancelada.' });
+        }
+  
+        res.status(200).send({ message: 'Cita cancelada exitosamente.' });
+    } catch (error) {
+        console.error('Error al cancelar la cita:', error);
+        res.status(500).send({ message: 'Error al cancelar la cita.' });
+    }
+};
+
+  
+
+
   exports.verCitasProfesional = async (req, res) => {
     const { profesionalId } = req.params;
     if (!profesionalId) {

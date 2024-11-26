@@ -1,5 +1,5 @@
 const express = require('express');
-const { crearCita, validarCita, obtenerCitasPorUsuario, crearHorarioDisponible, verCitasUsuario,verCitasProfesional, obtenerHorariosDisponiblesGlobales  } = require('../controllers/citasController.js');
+const { crearCita, validarCita, obtenerCitasPorUsuario, cancelarCita, crearHorarioDisponible, verCitasUsuario,verCitasProfesional, obtenerHorariosDisponiblesGlobales  } = require('../controllers/citasController.js');
 const router = express.Router();
 const citasController = require('../controllers/citasController');
 
@@ -14,6 +14,10 @@ router.put('/validar-cita/:cita_id', validarCita);
 router.get('/profesional/:profesionalId', citasController.verCitasProfesional);
 // Ruta para obtener citas de un usuario específico
 router.get('/usuario/:usuarioId', verCitasUsuario);
+
+// Ruta para cancelar una cita
+router.patch('/cancelar/:citaId', cancelarCita);
+
 
 router.get('/disponibles', citasController.obtenerHorariosDisponiblesGlobales);
 // Ruta para obtener las citas de un usuario específico
